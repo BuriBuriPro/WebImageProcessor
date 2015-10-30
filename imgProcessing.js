@@ -20,10 +20,13 @@ window.onload = function(){
 		canvas.height = imgWindow.height;
 		context.drawImage(imgWindow, 0, 0);
 		imgData = context.getImageData(0, 0, imgWindow.width, imgWindow.height);
+		console.log(imgData);
 		var test = new ImgDataObj();
 		test.saveImgData(imgData);
-		var temp = test.transImgData(imgData, context);
-		console.log(temp);
+		var temp = test.transImgData(context);
+		
+		var temp2 = test.reverseImg().transImgData(context);
+		context.putImageData(temp2, 0, 0)
 	}
 
 	// 创建ImgDataObj存放获取了RGBA的值的对象
@@ -33,6 +36,8 @@ window.onload = function(){
 		this.blue = [];
 		this.alpha = [];
 		this.length = 0;
+		this.width = 0;
+		this.height = 0;
 	}
 	ImgDataObj.prototype = {
 		constructor : ImgDataObj,
@@ -46,11 +51,14 @@ window.onload = function(){
 				this.alpha[i] = imgData.data[j + 3];
 			}			
 			this.length = imgData.data.length / 4;
+			this.width = imgData.width;
+			this.height = imgData.height;
+			return this;
 		},
-		transImgData : function(imgData, cxt){
+		transImgData : function(cxt){
 			// 把获取的图像数据转化为ImageData对象
 			var i = 0, j = 0,
-				tempImgData = cxt.createImageData(imgData);				
+				tempImgData = cxt.createImageData(this.width, this.height);				
 			for(; j < this.length; j++){
 				tempImgData.data[i ++] = this.red[j];
 				tempImgData.data[i ++] = this.green[j];
@@ -58,6 +66,13 @@ window.onload = function(){
 				tempImgData.data[i ++] = this.alpha[j];
 			}
 			return tempImgData;
+		},
+		reverseImg : function(){
+			this.red.reverse(); 
+			this.green.reverse();
+			this.blue.reverse();
+			// this.alpha.reverse();
+			return this;
 		}
 	}
 
