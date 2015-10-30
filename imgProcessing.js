@@ -25,7 +25,7 @@ window.onload = function(){
 		test.saveImgData(imgData);
 		var temp = test.transImgData(context);
 		
-		var temp2 = test.reverseImg().transImgData(context);
+		var temp2 = test.negateColor().transImgData(context);
 		context.putImageData(temp2, 0, 0)
 	}
 
@@ -72,6 +72,20 @@ window.onload = function(){
 			this.green.reverse();
 			this.blue.reverse();
 			// this.alpha.reverse();
+			return this;
+		},
+		negateColor : function(){
+			// 颜色取反
+			var negation = function (arr){
+				var i = 0;
+				for(;i < arr.length; i ++){
+					arr[i] = 255 - arr[i];
+				}
+				// return arr;
+			};			
+			negation(this.red);
+			negation(this.green);
+			negation(this.blue);			
 			return this;
 		}
 	}
