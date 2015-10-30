@@ -20,7 +20,10 @@ window.onload = function(){
 		canvas.height = imgWindow.height;
 		context.drawImage(imgWindow, 0, 0);
 		imgData = context.getImageData(0, 0, imgWindow.width, imgWindow.height);
-		
+		var test = new ImgDataObj();
+		test.saveImgData(imgData);
+		var temp = test.transImgData(imgData, context);
+		console.log(temp);
 	}
 
 	// 创建ImgDataObj存放获取了RGBA的值的对象
@@ -34,23 +37,25 @@ window.onload = function(){
 	ImgDataObj.prototype = {
 		constructor : ImgDataObj,
 		saveImgData : function(imgData){
+			// 存放获取的图像的数据
 			var i = 0, j = 0;
-			for(; j < imgData.length; i ++, j += 4){
+			for(; j < imgData.data.length; i ++, j += 4){
 				this.red[i] = imgData.data[j];
 				this.green[i] = imgData.data[j + 1];
 				this.blue[i] = imgData.data[j + 2];
 				this.alpha[i] = imgData.data[j + 3];
 			}			
-			this.length = imgData.length / 4;
-		}
-		transImgData : function(imgData){
+			this.length = imgData.data.length / 4;
+		},
+		transImgData : function(imgData, cxt){
+			// 把获取的图像数据转化为ImageData对象
 			var i = 0, j = 0,
-				tempImgData = createImageData(imgData);				
-			for(; j < this.length; i += 4, j++){
-				tempImgData.data.red[i] = this.red[j];
-				tempImgData.data.green[i] = this.green[j];
-				tempImgData.data.blue[i] = this.blue[j];
-				tempImgData.data.alpha[i] = this.alpha[j];
+				tempImgData = cxt.createImageData(imgData);				
+			for(; j < this.length; j++){
+				tempImgData.data[i ++] = this.red[j];
+				tempImgData.data[i ++] = this.green[j];
+				tempImgData.data[i ++] = this.blue[j];
+				tempImgData.data[i ++] = this.alpha[j];
 			}
 			return tempImgData;
 		}
