@@ -28,10 +28,11 @@ imgWindow.onload = function(){
 	imgObj.saveImgData(imgData);
 	console.log(imgObj);
 	btn.addEventListener("click", function(){
-		ImgProcessor.reverseImg(imgObj);
+		ImgProcessor.negateColor(imgObj);
 		imgData = imgObj.transImgData(context);
 		context.putImageData(imgData, 0, 0);
-	}, false);		
+	}, false);	
+	imgObj.trans2Mat();	
 }
 
 
@@ -72,6 +73,10 @@ ImgDataObj.prototype = {
 			tempImgData.data[i ++] = this.alpha[j];
 		}
 		return tempImgData;
+	},
+	trans2Mat : function(){
+		var temp = arr2Mat(this.red, this.width, this,height);
+		log(temp);
 	}
 }
 ImgProcessor = {
@@ -94,7 +99,6 @@ ImgProcessor = {
 			negation(ImgDataObj.green);
 			negation(ImgDataObj.blue);
 		}
-
 }
 function arr2Mat(arr, width, height){
 			var i, j,
@@ -118,4 +122,7 @@ function mat2Arr(mat){
 		}
 	}
 	return arr;
+}
+function log(exp){
+	console.log(exp);
 }
