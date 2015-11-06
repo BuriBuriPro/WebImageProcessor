@@ -4,7 +4,8 @@ var imgFile = document.getElementById("imgFile"),
 	canvas = document.getElementById("canvas"),
 	context = canvas.getContext("2d"),
 	imgData = null,
-	reader = new FileReader();
+	reader = new FileReader(),
+	btn = document.getElementById("btn");
 
 // 读取上传的图片
 // 考虑使用单例模型
@@ -21,8 +22,18 @@ imgWindow.onload = function(){
 	canvas.width = imgWindow.width;
 	canvas.height = imgWindow.height;
 	context.drawImage(imgWindow, 0, 0);
-	imgData = context.getImageData(0, 0, imgWindow.width, imgWindow.height);		
+	imgData = context.getImageData(0, 0, imgWindow.width, imgWindow.height);	
+	// 处理按钮
+	var imgObj = new ImgDataObj();
+	imgObj.saveImgData(imgData);
+	console.log(imgObj);
+	btn.addEventListener("click", function(){
+		ImgProcessor.reverseImg(imgObj);
+		imgData = imgObj.transImgData(context);
+		context.putImageData(imgData, 0, 0);
+	}, false);		
 }
+
 
 // 创建ImgDataObj存放获取了RGBA的值的对象
 function ImgDataObj(){		
@@ -61,35 +72,30 @@ ImgDataObj.prototype = {
 			tempImgData.data[i ++] = this.alpha[j];
 		}
 		return tempImgData;
-	},
-	ImgProcessor : {
-		reverseImg : function(){
-			this.red.reverse(); 
-			this.green.reverse();
-			this.blue.reverse();
-			// this.alpha.reverse();
-			return this;
+	}
+}
+ImgProcessor = {
+	// 翻转图像
+	reverseImg : function(ImgDataObj){
+			ImgDataObj.red.reverse(); 
+			ImgDataObj.green.reverse();
+			ImgDataObj.blue.reverse();
+			// this.alpha.reverse();			
 		},
-		negateColor : function(){
+	negateColor : function(ImgDataObj){
 			// 颜色取反
 			var negation = function (arr){
 				var i = 0;
 				for(;i < arr.length; i ++){
 					arr[i] = 255 - arr[i];
-				}
-				// return arr;
+				}				
 			}
-		// blur : function(){
-			
+			negation(ImgDataObj.red);
+			negation(ImgDataObj.green);
+			negation(ImgDataObj.blue);
 		}
-		
-			// negation(this.red);
-			// negation(this.green);
-			// negation(this.blue);			
-			// return this;
-		}
-	}
-// }
+
+}
 function arr2Mat(arr, width, height){
 			var i, j,
 				mat = Array();			
