@@ -12,9 +12,9 @@ var imgFile = document.getElementById("imgFile"),
 imgFile.addEventListener("change", function(){		
 	reader.onload = function(){			
 		imgWindow.src = reader.result;
-		if(imgWindow.width > 100 || imgWindow.height > 100){
-			return;
-		}
+		// if(imgWindow.width > 100 || imgWindow.height > 100){
+		// 	return;
+		// }
 	}
 	reader.readAsDataURL(this.files[0]);
 });
@@ -31,21 +31,25 @@ imgWindow.onload = function(){
 		ImgProcessor.negateColor(imgObj);
 		imgData = imgObj.transImgData(context);
 		context.putImageData(imgData, 0, 0);
-	}, false);	
+	}, false);		
+	// imgObj.trans2Mat();
 	// imgObj.trans2Mat();	
 }
 
 
 // 创建ImgDataObj存放获取了RGBA的值的对象
 function ImgDataObj(){
+	// 用数组存放RGBA，方便处理
 	var red = [],
 		green = [],
 		blue = [],
 		alpha = [];
-	this.rgba = [red, green, blue, alpha];	
+	this.rgba = [red, green, blue, alpha];
 	this.length = 0;
 	this.width = 0;
 	this.height = 0;
+	// 标记现在的RGBA是数组还是矩阵
+	this.flagAM = "array";
 }
 ImgDataObj.prototype = {
 	constructor : ImgDataObj,
@@ -76,33 +80,51 @@ ImgDataObj.prototype = {
 		return tempImgData;
 	},
 	trans2Mat : function(){
-		var temp = arr2Mat(this.rgba.red, this.width, this.height);
-		
+		if(this.flagAM === "matrix"){
+			alert("目前已经是矩阵");
+			return;
+		}
+		for(var i = 0; i < 4; i ++){
+			this.rgba[i] = arr2Mat(this.rgba[i], this.width, this.height);
+		}
+		this.flagAM = "matrix";
+	},
+	trans2Arr : function(){
+		if(this.flagAM === "array"){
+			alert("目前已经是数组");
+			return;
+		}		
+		for(var i = 0; i < 4; i ++){
+			this.rgba[i] = mat2Arr(this.rgba[i]);
+		}					
+		this.flagAM = "array";
 	}
 }
 ImgProcessor = {
 	// 翻转图像
-	reverseImg : function(ImgDataObj){			
-			for(var i = 0; i < 3; i ++){
-				ImgDataObj.rgba[i].reverse();
-			}
-			// this.alpha.reverse();			
-		},
+	reverseImg : function(ImgDataObj){	
+		if(this.flagAM === "mat"){
+			ImgDataObj.trans2Arr();
+		}		
+		for(var i = 0; i < 3; i ++){
+			ImgDataObj.rgba[i].reverse();
+		}		
+	},
 	negateColor : function(ImgDataObj){
-			// 颜色取反
-			var negation = function (arr){
-				var i = 0;
-				for(;i < arr.length; i ++){
-					arr[i] = 255 - arr[i];
-				}				
-			}
-			for(var i = 0; i < 3; i ++){
-				negation(ImgDataObj.rgba[i]);
-			}
-			// negation(ImgDataObj.rgba.red);
-			// negation(ImgDataObj.rgba.green);
-			// negation(ImgDataObj.rgba.blue);
+		if(this.flagAM === "mat"){
+			ImgDataObj.trans2Arr();
 		}
+		// 颜色取反
+		var negation = function (arr){
+			var i = 0;
+			for(;i < arr.length; i ++){
+				arr[i] = 255 - arr[i];
+			}				
+		}
+		for(var i = 0; i < 3; i ++){
+			negation(ImgDataObj.rgba[i]	);
+		}
+	}
 }
 function arr2Mat(arr, width, height){
 			var i, j,
