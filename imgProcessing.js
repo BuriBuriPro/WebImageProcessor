@@ -26,22 +26,23 @@ imgWindow.onload = function(){
 	// 处理按钮
 	var imgObj = new ImgDataObj();
 	imgObj.saveImgData(imgData);
-	console.log(imgObj);
+	// console.log(imgObj);
 	btn.addEventListener("click", function(){
 		ImgProcessor.negateColor(imgObj);
 		imgData = imgObj.transImgData(context);
 		context.putImageData(imgData, 0, 0);
 	}, false);	
-	imgObj.trans2Mat();	
+	// imgObj.trans2Mat();	
 }
 
 
 // 创建ImgDataObj存放获取了RGBA的值的对象
-function ImgDataObj(){		
-	this.red = [];
-	this.green = [];
-	this.blue = [];
-	this.alpha = [];
+function ImgDataObj(){
+	var red = [],
+		green = [],
+		blue = [],
+		alpha = [];
+	this.rgba = [red, green, blue, alpha];	
 	this.length = 0;
 	this.width = 0;
 	this.height = 0;
@@ -52,10 +53,10 @@ ImgDataObj.prototype = {
 		// 存放获取的图像的数据
 		var i = 0, j = 0;
 		for(; j < imgData.data.length; i ++, j += 4){
-			this.red[i] = imgData.data[j];
-			this.green[i] = imgData.data[j + 1];
-			this.blue[i] = imgData.data[j + 2];
-			this.alpha[i] = imgData.data[j + 3];
+			this.rgba[0][i] = imgData.data[j];
+			this.rgba[1][i] = imgData.data[j + 1];
+			this.rgba[2][i] = imgData.data[j + 2];
+			this.rgba[3][i] = imgData.data[j + 3];
 		}			
 		this.length = imgData.data.length / 4;
 		this.width = imgData.width;
@@ -67,24 +68,24 @@ ImgDataObj.prototype = {
 		var i = 0, j = 0,
 			tempImgData = cxt.createImageData(this.width, this.height);				
 		for(; j < this.length; j++){
-			tempImgData.data[i ++] = this.red[j];
-			tempImgData.data[i ++] = this.green[j];
-			tempImgData.data[i ++] = this.blue[j];
-			tempImgData.data[i ++] = this.alpha[j];
+			tempImgData.data[i ++] = this.rgba[0][j];
+			tempImgData.data[i ++] = this.rgba[1][j];
+			tempImgData.data[i ++] = this.rgba[2][j];
+			tempImgData.data[i ++] = this.rgba[3][j];
 		}
 		return tempImgData;
 	},
 	trans2Mat : function(){
-		var temp = arr2Mat(this.red, this.width, this,height);
-		log(temp);
+		var temp = arr2Mat(this.rgba.red, this.width, this.height);
+		
 	}
 }
 ImgProcessor = {
 	// 翻转图像
-	reverseImg : function(ImgDataObj){
-			ImgDataObj.red.reverse(); 
-			ImgDataObj.green.reverse();
-			ImgDataObj.blue.reverse();
+	reverseImg : function(ImgDataObj){			
+			for(var i = 0; i < 3; i ++){
+				ImgDataObj.rgba[i].reverse();
+			}
 			// this.alpha.reverse();			
 		},
 	negateColor : function(ImgDataObj){
@@ -95,9 +96,12 @@ ImgProcessor = {
 					arr[i] = 255 - arr[i];
 				}				
 			}
-			negation(ImgDataObj.red);
-			negation(ImgDataObj.green);
-			negation(ImgDataObj.blue);
+			for(var i = 0; i < 3; i ++){
+				negation(ImgDataObj.rgba[i]);
+			}
+			// negation(ImgDataObj.rgba.red);
+			// negation(ImgDataObj.rgba.green);
+			// negation(ImgDataObj.rgba.blue);
 		}
 }
 function arr2Mat(arr, width, height){
