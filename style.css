@@ -1,0 +1,37 @@
+body, div, h2{
+	margin: 0;
+	padding: 0;
+}
+html, body{
+	width: 100%;
+	height: 100%;
+}
+#panel{
+	height: 100%;
+	width: 200px;
+	background-color: silver;
+	float: left;	
+}
+#panel #imgFile{
+	display: none;
+}
+#panel button{
+	display: block;
+	margin-top: 10px;
+	margin-left: 10px;
+}
+#screen{
+	margin-left: 210px;
+}
+#screen h2{
+	margin-bottom: 5px;
+}
+#screen img{
+	margin-top: 10px;
+}
+#screen hr{
+	width: 70%;
+	margin-right: 30%;
+}
+#screen #canvas{
+}

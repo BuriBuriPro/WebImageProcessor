@@ -5,16 +5,17 @@ var imgFile = document.getElementById("imgFile"),
 	context = canvas.getContext("2d"),
 	imgData = null,
 	reader = new FileReader(),
-	btn = document.getElementById("btn");
+	btnColorNegation = document.getElementById("btnColorNegation"),
+	btnHorMirror = document.getElementById("btnHorMirror"),
+	btnVerMirror = document.getElementById("btnVerMirror"),
+	btnRotate = document.getElementById("rotation");
+const PI = Math.PI;
 
 // 读取上传的图片
 // 考虑使用单例模型
 imgFile.addEventListener("change", function(){		
 	reader.onload = function(){			
 		imgWindow.src = reader.result;
-		// if(imgWindow.width > 100 || imgWindow.height > 100){
-		// 	return;
-		// }
 	}
 	reader.readAsDataURL(this.files[0]);
 });
@@ -26,17 +27,47 @@ imgWindow.onload = function(){
 	// 处理按钮
 	var imgObj = new ImgDataObj();
 	imgObj.saveImgData(imgData);
-	// console.log(imgObj);
-	btn.addEventListener("click", function(){
+	btnColorNegation.addEventListener("click", function(){
 		ImgProcessor.negateColor(imgObj);
 		imgData = imgObj.transImgData(context);
+		
 		context.putImageData(imgData, 0, 0);
+
+		// context.scale(2, 2);
+		// context.drawImage(imgWindow, -50, -50);	
 	}, false);		
-	// imgObj.trans2Mat();
-	// imgObj.trans2Mat();	
+	btnRotate.children[1].addEventListener("click", function(){
+		var deg = btnRotate.children[0].value;
+		if(!deg){
+			alert("请先输入旋转的度数");
+		}
+		context.clearRect(0, 0, canvas.width, canvas.height);
+		context.translate(canvas.width/2, canvas.height/2);
+		context.rotate(deg * PI / 180);
+		context.translate(-canvas.width/2, -canvas.height/2);
+
+		context.drawImage(imgWindow, 0, 0);
+		// canvas.style.transform = "rotate(" + deg + "deg)";
+	}, false);
+	btnHorMirror.addEventListener("click", function(){
+		context.clearRect(0, 0, canvas.width, canvas.height);
+		context.translate(canvas.width/2, canvas.height/2);
+		context.scale(-1, 1);
+		context.translate(-canvas.width/2, -canvas.height/2);
+		context.drawImage(imgWindow, 0, 0);
+	}, false);
+	btnVerMirror.addEventListener("click", function(){
+		context.clearRect(0, 0, canvas.width, canvas.height);
+		context.translate(canvas.width/2, canvas.height/2);
+		context.scale(1, -1);
+		context.translate(-canvas.width/2, -canvas.height/2);
+		context.drawImage(imgWindow, 0, 0);
+	}, false);
+	canvas.addEventListener("dblclick", function(e){
+		// 放大缩小功能
+	}, false);
+
 }
-
-
 // 创建ImgDataObj存放获取了RGBA的值的对象
 function ImgDataObj(){
 	// 用数组存放RGBA，方便处理
@@ -80,6 +111,7 @@ ImgDataObj.prototype = {
 		return tempImgData;
 	},
 	trans2Mat : function(){
+		// 把RGBA数据转换为矩阵
 		if(this.flagAM === "matrix"){
 			alert("目前已经是矩阵");
 			return;
@@ -90,6 +122,7 @@ ImgDataObj.prototype = {
 		this.flagAM = "matrix";
 	},
 	trans2Arr : function(){
+		// 把RGBA数据转为一位数组
 		if(this.flagAM === "array"){
 			alert("目前已经是数组");
 			return;
@@ -148,6 +181,9 @@ function mat2Arr(mat){
 		}
 	}
 	return arr;
+}
+function scaleUp(cxt){
+	
 }
 function log(exp){
 	console.log(exp);

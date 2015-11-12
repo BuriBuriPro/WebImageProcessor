@@ -3,23 +3,41 @@
 <head>
 	<meta charset="UTF-8">
 	<title>图像处理</title>
-	<link rel="stylesheet" type="text/css" href="style.css" />
-	
+	<link rel="stylesheet" type="text/css" href="style.css" />	
 </head>
-<body>	
-	<input id="imgFile" type="file" />
-	<div>
-		<h2>上传图片的预览</h2>
-		<img id="imgWindow" src=""  alt="Show the chosen Image" />
-	</div>
-	<div>
-		<h2>操作画布</h2>
-		<canvas id="canvas">
-			你的浏览器不支持此页面，请更换浏览器。
-		</canvas>
-	</div>
-	<div>
-		<button id="btn">改变图片</button>
+<body>
+	<div id="panel">	
+		<label>			
+			This is an upload button.
+			<input id="imgFile" type="file"  />			
+		</label>
+		<div id="rotation">
+			<input type="text" /><button>旋转</button>
+		</div>		
+		<button id="btnColorNegation">颜色取反</button>
+		<button id="btnHorMirror">水平镜像</button>
+		<button id="btnVerMirror">垂直镜像</button>
+		<div id="btnTailor">
+			<input type="text" />
+			<input type="text" />
+			<input type="text" />
+			<input type="text" />
+			<button>裁剪</button>
+		</div>
+
+	</div>	
+	<div id="screen">
+		<div>
+			<h2>上传图片的预览</h2>
+			<img id="imgWindow" src=""  alt="Show the chosen Image" />
+		</div>
+		<hr/>
+		<div>
+			<h2>操作画布</h2>
+			<canvas id="canvas">
+				你的浏览器不支持此页面，请更换浏览器。
+			</canvas>
+		</div>
 	</div>
 </body>
 	<script src="imgProcessing.js"></script>
