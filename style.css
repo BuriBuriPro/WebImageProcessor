@@ -12,7 +12,10 @@ html, body{
 	background-color: silver;
 	float: left;	
 }
-#panel #imgFile{
+#panel label{
+	background-color: #AABBCC;
+}
+#panel #uploadImgBtn{
 	display: none;
 }
 #panel button{
