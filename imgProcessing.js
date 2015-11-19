@@ -10,14 +10,15 @@ var context = canvas.getContext("2d"),
 	canvasHeight = 300,
 	imgData = null,
 	reader = new FileReader(),
-	imgObj = new ImgDataObj();
-
+	imgObj = new ImgDataObj(),
+	savedImg = new Image();
 
 // 获取按键
 var invertion = getElem("btnInvert"),
 	reliefImg = getElem("btnRelief"),
 	fogImg = getElem("btnFog"),
-	blurImg = getElem("btnBlur");
+	blurImg = getElem("btnBlur"),
+	horMirror = getElem("btnHorMirror");
 
 uploadImgBtn.addEventListener("change", function(){
 	// 读取并显示上传的图片
@@ -36,25 +37,24 @@ imgWindow.onload = function(){
 
 	// 添加按键功能
 	invertion.addEventListener("click", function(){
-		log(imgObj.rgba[0])		
 		ImgProcessor.invertColor(imgObj);
-		imgData = imgObj.trans2ImgData(context);
-		context.putImageData(imgData, 0, 0);
+		updataCanvas();
 	});
 	reliefImg.addEventListener("click", function(){
 		ImgProcessor.reliefEffect(imgObj);
-		imgData = imgObj.trans2ImgData(context);
-		context.putImageData(imgData, 0, 0);
+		updataCanvas();
 	});
 	fogImg.addEventListener("click", function(){
 		ImgProcessor.fogEffect(imgObj);
-		imgData = imgObj.trans2ImgData(context);
-		context.putImageData(imgData, 0, 0);
+		updataCanvas();
 	}),
 	blurImg.addEventListener("click", function(){
 		ImgProcessor.blurEffect(imgObj);
-		imgData = imgObj.trans2ImgData(context);
-		context.putImageData(imgData, 0, 0);
+		updataCanvas();
+	}),
+	horMirror.addEventListener("click", function(){
+		ImgProcessor.reverseImg(imgObj);
+		updataCanvas();
 	})
 }
 
@@ -66,7 +66,11 @@ function getElem(tagID){
 	temp = document.getElementById(tagID);
 	return temp
 }
-
+// 更新canvas的函数
+function updataCanvas(){
+	imgData = imgObj.trans2ImgData(context);
+	context.putImageData(imgData, 0, 0)
+}
 // 方便测试输出的函数
 function log(exp){
 	console.log(exp);

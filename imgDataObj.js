@@ -92,7 +92,7 @@ ImgProcessor = {
 	reverseImg : function(ImgDataObj){	
 		this.checkNTrans(ImgDataObj, "array");	
 		for(var i = 0; i < 3; i ++){
-			ImgDataObj.rgba[i].reverse();
+			// ImgDataObj.rgba[i].each(reverse();
 		}		
 	},
 	invertColor : function(ImgDataObj){
@@ -222,15 +222,11 @@ function blur(mat, width, height){
 								mat[i + 1][j] * template[7] +
 								mat[i + 1][j + 1] * template[8];
 			}
-		}
-		
+		}		
 	}
 	return tempMat;
 }
 
-// var a = [[1, 2, 3, 4, 5, 6],[4, 5, 6, 7, 8, 9],[7, 8, 9, 1, 2, 3],[1, 2, 3, 4, 5, 6],[4, 5, 6, 7, 8, 9],[7, 8, 9, 1, 2, 3]];
-// log(blur(a, 3, 3));
-// 方便测试输出的函数
 function log(exp){
 	console.log(exp);
 }
