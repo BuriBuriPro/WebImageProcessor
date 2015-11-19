@@ -1,9 +1,7 @@
-
 // 获取标签
 var uploadImgBtn = getElem("uploadImgBtn"),
 	imgWindow = getElem("imgWindow"),
 	canvas = getElem("canvas");
-
 
 // 设置常用变量
 const PI = Math.PI;
@@ -13,6 +11,10 @@ var context = canvas.getContext("2d"),
 	imgData = null,
 	reader = new FileReader(),
 	imgObj = new ImgDataObj();
+
+
+// 获取按键
+var invertion = getElem("invertion");
 
 uploadImgBtn.addEventListener("change", function(){
 	// 读取并显示上传的图片
@@ -28,6 +30,13 @@ imgWindow.onload = function(){
 	context.drawImage(imgWindow, 0, 0);
 	imgData = context.getImageData(0, 0, imgWindow.width, imgWindow.height);		
 	imgObj.saveImgData(imgData);
+
+	// 添加按键功能
+	invertion.addEventListener("click", function(){
+		ImgProcessor.invertColor(imgObj);
+		imgData = imgObj.trans2ImgData(context);
+		context.putImageData(imgData, 0, 0);
+	})
 }
 
 // 兼容浏览器的添加事件对象
@@ -43,3 +52,6 @@ function getElem(tagID){
 function log(exp){
 	console.log(exp);
 }
+
+// ---------------------------------
+

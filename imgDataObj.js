@@ -31,7 +31,7 @@ ImgDataObj.prototype = {
 		this.height = imgData.height;
 		return this;
 	},
-	transImgData : function(cxt){
+	trans2ImgData : function(cxt){
 		// 把获取的图像数据转化为ImageData对象
 		var i = 0, j = 0,
 			tempImgData = cxt.createImageData(this.width, this.height);				
@@ -82,7 +82,7 @@ ImgProcessor = {
 		} else if(flag === "mat"){
 			ImgDataObj.trans2Mat();
 		}
-	}
+	},
 	// 翻转图像
 	reverseImg : function(ImgDataObj){	
 		if(this.flagAM === "mat"){
@@ -92,25 +92,19 @@ ImgProcessor = {
 			ImgDataObj.rgba[i].reverse();
 		}		
 	},
-	negateColor : function(ImgDataObj){
+	invertColor : function(ImgDataObj){
+		// 取反色
 		if(this.flagAM === "mat"){
 			ImgDataObj.trans2Arr();
-		}
-		// 颜色取反
-		var negation = function (arr){
-			var i = 0;
-			for(;i < arr.length; i ++){
-				arr[i] = 255 - arr[i];
-			}				
-		}
+		}		
 		for(var i = 0; i < 3; i ++){
-			negation(ImgDataObj.rgba[i]	);
+			invert(ImgDataObj.rgba[i]);
 		}
-	},
-	reliefEffect : function(ImgDataObj){
-		// 浮雕效果
-		if(this.flagAM === )
-	}	
+	}
+	// reliefEffect : function(ImgDataObj){
+	// 	// 浮雕效果
+	// 	if(this.flagAM === )
+	// }	
 }
 
 // 公有化方便计算的函数
@@ -139,6 +133,13 @@ function mat2Arr(mat){
 		}
 	}
 	return arr;
+}
+function invert(arr){
+	// 取反
+	var i = 0;
+	for(;i < arr.length; i ++){
+		arr[i] = 255 - arr[i];
+	}				
 }
 function relief(mat, width, height){
 	// 实现矩阵对角相减的函数
