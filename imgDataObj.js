@@ -33,8 +33,11 @@ ImgDataObj.prototype = {
 	},
 	trans2ImgData : function(cxt){
 		// 把获取的图像数据转化为ImageData对象
+		// if(this.flagAM === "matrix"){
+		// 	this.trans2Arr();
+		// }
 		var i = 0, j = 0,
-			tempImgData = cxt.createImageData(this.width, this.height);				
+			tempImgData = cxt.createImageData(this.width, this.height);	
 		for(; j < this.length; j++){
 			tempImgData.data[i ++] = this.rgba[0][j];
 			tempImgData.data[i ++] = this.rgba[1][j];
@@ -77,34 +80,41 @@ ImgDataObj.prototype = {
 ImgProcessor = {
 	// 检测并转换数据格式
 	checkNTrans : function(ImgDataObj, flag){
-		if(flag === "arr"){
-			ImgDataObj.trans2Arr();
-		} else if(flag === "mat"){
-			ImgDataObj.trans2Mat();
-		}
+		if(flag != ImgDataObj.flagAM){
+			if(flag == "array"){
+				ImgDataObj.trans2Arr();
+			} else if(flag == "matrix"){
+				ImgDataObj.trans2Mat();
+			}
+		} else{}
 	},
 	// 翻转图像
 	reverseImg : function(ImgDataObj){	
-		if(this.flagAM === "mat"){
-			ImgDataObj.trans2Arr();
-		}		
+		this.checkNTrans(ImgDataObj, "array");	
 		for(var i = 0; i < 3; i ++){
 			ImgDataObj.rgba[i].reverse();
 		}		
 	},
 	invertColor : function(ImgDataObj){
 		// 取反色
-		if(this.flagAM === "mat"){
-			ImgDataObj.trans2Arr();
-		}		
+		this.checkNTrans(ImgDataObj, "array");
 		for(var i = 0; i < 3; i ++){
 			invert(ImgDataObj.rgba[i]);
 		}
-	}
-	// reliefEffect : function(ImgDataObj){
-	// 	// 浮雕效果
-	// 	if(this.flagAM === )
-	// }	
+	},
+	reliefEffect : function(ImgDataObj){
+		// 浮雕效果
+		this.checkNTrans(ImgDataObj, "matrix");
+		
+		for(var i = 0; i < 3; i ++){
+			var tempWidth = ImgDataObj.rgba[i].width,
+				tempHeight = ImgDataObj.rgba[i].height;
+			ImgDataObj.rgba[i] = relief(ImgDataObj.rgba[i], ImgDataObj.width, ImgDataObj.height);
+			ImgDataObj.rgba[i].width = tempWidth;
+			ImgDataObj.rgba[i].height = tempHeight;
+		}
+		this.checkNTrans(ImgDataObj, "array");
+	}	
 }
 
 // 公有化方便计算的函数
@@ -151,12 +161,20 @@ function relief(mat, width, height){
 			if(j == width - 1 || i == height - 1){
 				tempMat[i][j] = mat[i][j];
 			} else{				
-				tempMat[i][j] = mat[i][j] - mat[i+1][j+1];
+				tempMat[i][j] = mat[i][j] - mat[i+1][j+1] + 128;
+				// if(tempMat[i][j] < 0){
+				// 	tempMat[i][j] = 0;
+				// }
 			}
 		}
 	}
 	return tempMat;
 }
+
+var a = [[1, 2, 3],[4, 5, 6],[7, 8, 9]];
+var m = [[1,2],[3,4]]
+a = relief(a, 3, 3);
+log(a)
 
 
 // 方便测试输出的函数

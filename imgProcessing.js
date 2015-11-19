@@ -14,7 +14,8 @@ var context = canvas.getContext("2d"),
 
 
 // 获取按键
-var invertion = getElem("invertion");
+var invertion = getElem("btnInvert"),
+	reliefImg = getElem("btnRelief");
 
 uploadImgBtn.addEventListener("change", function(){
 	// 读取并显示上传的图片
@@ -33,7 +34,13 @@ imgWindow.onload = function(){
 
 	// 添加按键功能
 	invertion.addEventListener("click", function(){
+		log(imgObj.rgba[0])		
 		ImgProcessor.invertColor(imgObj);
+		imgData = imgObj.trans2ImgData(context);
+		context.putImageData(imgData, 0, 0);
+	});
+	reliefImg.addEventListener("click", function(){
+		ImgProcessor.reliefEffect(imgObj);
 		imgData = imgObj.trans2ImgData(context);
 		context.putImageData(imgData, 0, 0);
 	})
@@ -52,6 +59,3 @@ function getElem(tagID){
 function log(exp){
 	console.log(exp);
 }
-
-// ---------------------------------
-
