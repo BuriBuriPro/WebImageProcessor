@@ -15,7 +15,9 @@ var context = canvas.getContext("2d"),
 
 // 获取按键
 var invertion = getElem("btnInvert"),
-	reliefImg = getElem("btnRelief");
+	reliefImg = getElem("btnRelief"),
+	fogImg = getElem("btnFog"),
+	blurImg = getElem("btnBlur");
 
 uploadImgBtn.addEventListener("change", function(){
 	// 读取并显示上传的图片
@@ -41,6 +43,16 @@ imgWindow.onload = function(){
 	});
 	reliefImg.addEventListener("click", function(){
 		ImgProcessor.reliefEffect(imgObj);
+		imgData = imgObj.trans2ImgData(context);
+		context.putImageData(imgData, 0, 0);
+	});
+	fogImg.addEventListener("click", function(){
+		ImgProcessor.fogEffect(imgObj);
+		imgData = imgObj.trans2ImgData(context);
+		context.putImageData(imgData, 0, 0);
+	}),
+	blurImg.addEventListener("click", function(){
+		ImgProcessor.blurEffect(imgObj);
 		imgData = imgObj.trans2ImgData(context);
 		context.putImageData(imgData, 0, 0);
 	})

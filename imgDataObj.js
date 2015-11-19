@@ -104,17 +104,51 @@ ImgProcessor = {
 	},
 	reliefEffect : function(ImgDataObj){
 		// 浮雕效果
-		this.checkNTrans(ImgDataObj, "matrix");
-		
-		for(var i = 0; i < 3; i ++){
-			var tempWidth = ImgDataObj.rgba[i].width,
-				tempHeight = ImgDataObj.rgba[i].height;
+		this.checkNTrans(ImgDataObj, "matrix");		
+		for(var i = 0; i < 3; i ++){			
 			ImgDataObj.rgba[i] = relief(ImgDataObj.rgba[i], ImgDataObj.width, ImgDataObj.height);
-			ImgDataObj.rgba[i].width = tempWidth;
-			ImgDataObj.rgba[i].height = tempHeight;
+			ImgDataObj.rgba[i].width = ImgDataObj.width;
+			ImgDataObj.rgba[i].height = ImgDataObj.height;
 		}
 		this.checkNTrans(ImgDataObj, "array");
-	}	
+	},
+	fogEffect : function(ImgDataObj){
+		// 雾化效果
+		this.checkNTrans(ImgDataObj, "array");		
+		// for(var i = 0; i < 3; i ++){
+		// 	ImgDataObj.rgba[i] = fog(ImgDataObj.rgba[i]);
+		// }
+		var ran = 0,
+			tempArr1 = [],
+			tempArr2 = [],
+			tempArr3 = [];
+		for(var i = 0; i < ImgDataObj.rgba[0].length; i ++){
+			ran = Math.floor(10 * Math.random()) * Math.floor(3 * Math.random() - 1);
+			if(i + ran >= 0 && i + ran < ImgDataObj.rgba[0].length){
+				tempArr1[i] = ImgDataObj.rgba[0][i + ran];
+				tempArr2[i] = ImgDataObj.rgba[1][i + ran];
+				tempArr3[i] = ImgDataObj.rgba[2][i + ran];
+			} else{
+				tempArr1[i] = ImgDataObj.rgba[0][ImgDataObj.rgba[0].length - 1];
+				tempArr1[i] = ImgDataObj.rgba[1][ImgDataObj.rgba[0].length - 1];
+				tempArr1[i] = ImgDataObj.rgba[2][ImgDataObj.rgba[0].length - 1];
+			}
+		}
+		ImgDataObj.rgba[0] = tempArr1;
+		ImgDataObj.rgba[1] = tempArr2;
+		ImgDataObj.rgba[2] = tempArr3;
+	},
+	blurEffect : function(ImgDataObj){
+		// 高斯模糊
+		this.checkNTrans(ImgDataObj, "matrix");
+		for(var i = 0; i < 3; i ++){
+			ImgDataObj.rgba[i] = blur(ImgDataObj.rgba[i], ImgDataObj.width, ImgDataObj.height);
+			ImgDataObj.rgba[i].width = ImgDataObj.width;
+			ImgDataObj.rgba[i].height = ImgDataObj.height;
+		}		
+		this.checkNTrans(ImgDataObj, "array");
+		log(ImgDataObj.rgba[0])
+	}
 }
 
 // 公有化方便计算的函数
@@ -162,15 +196,40 @@ function relief(mat, width, height){
 				tempMat[i][j] = mat[i][j];
 			} else{				
 				tempMat[i][j] = mat[i][j] - mat[i+1][j+1] + 128;
-				// if(tempMat[i][j] < 0){
-				// 	tempMat[i][j] = 0;
-				// }
 			}
 		}
 	}
 	return tempMat;
 }
+function blur(mat, width, height){
+	// σ=1.5时 高斯模板的权重
+	var template = [0.0947, 0.118, 0.0947, 0.118, 0.1477, 0.118, 0.0947, 0.118, 0.0947];
+	var tempMat = Array()
+	// 不处理边缘
+	for(var i = 0; i < height; i ++){
+		tempMat[i] = Array();
+		for(var j = 0; j < width; j ++){
+			if(j == 0 || j == width - 1 || i == 0 || i == height - 1){
+				tempMat[i][j] = mat[i][j];
+			} else{
+				tempMat[i][j] = mat[i - 1][j - 1] * template[0] + 
+								mat[i - 1][j] * template[1] +
+								mat[i - 1][j + 1] * template[2] +
+								mat[i][j - 1] * template[3] +
+								mat[i][j] * template[4] +
+								mat[i][j + 1] * template[5] +
+								mat[i + 1][j - 1] * template[6] +
+								mat[i + 1][j] * template[7] +
+								mat[i + 1][j + 1] * template[8];
+			}
+		}
+		
+	}
+	return tempMat;
+}
 
+// var a = [[1, 2, 3, 4, 5, 6],[4, 5, 6, 7, 8, 9],[7, 8, 9, 1, 2, 3],[1, 2, 3, 4, 5, 6],[4, 5, 6, 7, 8, 9],[7, 8, 9, 1, 2, 3]];
+// log(blur(a, 3, 3));
 // 方便测试输出的函数
 function log(exp){
 	console.log(exp);
