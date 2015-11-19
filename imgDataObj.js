@@ -171,11 +171,6 @@ function relief(mat, width, height){
 	return tempMat;
 }
 
-var a = [[1, 2, 3],[4, 5, 6],[7, 8, 9]];
-var m = [[1,2],[3,4]]
-a = relief(a, 3, 3);
-log(a)
-
 
 // 方便测试输出的函数
 function log(exp){
