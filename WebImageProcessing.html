@@ -24,9 +24,18 @@
 			<input type="text" />
 			<button>裁剪</button>
 		</div>
-		<button id="btnRelief">浮雕</button>
-		<button id="btnFog">雾化</button>
-		<button id="btnBlur">模糊</button>
+		<div class="imgEnhance">
+			<button id="btnMedFilt">中值滤波</button>
+		</div>
+		<div class="imgEffect">
+			<button id="btnRelief">浮雕</button>
+			<button id="btnFog">雾化</button>
+			<button id="btnBlur">模糊</button>
+			<button id="btnGrey">灰度化</button>
+			<button id="btnAddText">添加文字</button>
+		</div>
+		<button id="btnCompress">压缩图片</button>
+		<button id="btnRecover">还原</button>
 	</div>	
 	<div id="screen">
 		<div>
@@ -39,8 +48,10 @@
 			<canvas id="canvas">
 				你的浏览器不支持此页面，请更换浏览器。
 			</canvas>
+			<div id="coordinate"></div>
 		</div>
 	</div>
+
 </body>
 	<script src="imgDataObj.js" ></script>
 	<script src="imgProcessing.js" ></script>	

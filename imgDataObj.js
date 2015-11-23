@@ -33,9 +33,6 @@ ImgDataObj.prototype = {
 	},
 	trans2ImgData : function(cxt){
 		// 把获取的图像数据转化为ImageData对象
-		// if(this.flagAM === "matrix"){
-		// 	this.trans2Arr();
-		// }
 		var i = 0, j = 0,
 			tempImgData = cxt.createImageData(this.width, this.height);	
 		for(; j < this.length; j++){
@@ -114,24 +111,21 @@ ImgProcessor = {
 	},
 	fogEffect : function(ImgDataObj){
 		// 雾化效果
-		this.checkNTrans(ImgDataObj, "array");		
-		// for(var i = 0; i < 3; i ++){
-		// 	ImgDataObj.rgba[i] = fog(ImgDataObj.rgba[i]);
-		// }
+		this.checkNTrans(ImgDataObj, "array");	
 		var ran = 0,
 			tempArr1 = [],
 			tempArr2 = [],
 			tempArr3 = [];
 		for(var i = 0; i < ImgDataObj.rgba[0].length; i ++){
 			ran = Math.floor(10 * Math.random()) * Math.floor(3 * Math.random() - 1);
-			if(i + ran >= 0 && i + ran < ImgDataObj.rgba[0].length){
+			if(i + ran >= 0 && i + ran < ImgDataObj.length){
 				tempArr1[i] = ImgDataObj.rgba[0][i + ran];
 				tempArr2[i] = ImgDataObj.rgba[1][i + ran];
 				tempArr3[i] = ImgDataObj.rgba[2][i + ran];
 			} else{
-				tempArr1[i] = ImgDataObj.rgba[0][ImgDataObj.rgba[0].length - 1];
-				tempArr1[i] = ImgDataObj.rgba[1][ImgDataObj.rgba[0].length - 1];
-				tempArr1[i] = ImgDataObj.rgba[2][ImgDataObj.rgba[0].length - 1];
+				tempArr1[i] = ImgDataObj.rgba[0][ImgDataObj.length - 1];
+				tempArr1[i] = ImgDataObj.rgba[1][ImgDataObj.length - 1];
+				tempArr1[i] = ImgDataObj.rgba[2][ImgDataObj.length - 1];
 			}
 		}
 		ImgDataObj.rgba[0] = tempArr1;
@@ -146,9 +140,30 @@ ImgProcessor = {
 			ImgDataObj.rgba[i].width = ImgDataObj.width;
 			ImgDataObj.rgba[i].height = ImgDataObj.height;
 		}		
+		this.checkNTrans(ImgDataObj, "array");		
+	},
+	greyEffect : function(ImgDataObj){
+		// 灰度化
 		this.checkNTrans(ImgDataObj, "array");
-		log(ImgDataObj.rgba[0])
-	}
+		// 加权平均法处理rgb
+		// var greyValue = Array(ImgDataObj.length);
+		for(var i = 0; i < ImgDataObj.length; i ++){
+			var greyValue = 0;		
+			greyValue = 0.3 * ImgDataObj.rgba[0][i]
+					    + 0.59 * ImgDataObj.rgba[1][i]
+					    + 0.11 * ImgDataObj.rgba[2][i];
+			ImgDataObj.rgba[0][i] = greyValue;
+			ImgDataObj.rgba[1][i] = greyValue;
+			ImgDataObj.rgba[2][i] = greyValue;
+		}
+	},
+	medFilterEffect : function(ImgDataObj){
+		// 中值滤波
+		this.checkNTrans(ImgDataObj, "array");
+		for(var i = 0; i < ImgDataObj.rgba.length; i ++){
+			ImgDataObj.rgba[i] = medFilter(ImgDataObj.rgba[i], ImgDataObj.width, ImgDataObj.height);
+		}
+	}	
 }
 
 // 公有化方便计算的函数
@@ -225,6 +240,37 @@ function blur(mat, width, height){
 		}		
 	}
 	return tempMat;
+}
+function medFilter(arr, width, height){	
+	var med = 0,
+		tempArr = Array(9),
+		res = Array(width * height);
+	for(var i = 0; i < height; i ++){
+		for(var j = 0; j < width; j ++){
+			if(i == 0 || i == height - 1 || j == 0 || j == width - 1){
+				// 不处理边缘
+				res[i * width + j] = arr[i * width + j];
+			} else{
+				tempArr = neighbor(arr, width, i, j);
+				tempArr.sort();
+				res[i * width + j] = tempArr[4];
+			}
+		}
+	}
+	return res;
+}
+function neighbor(arr, width, x, y){
+    var tempArr = [];
+    tempArr[0] = arr[(x - 1) * width + y - 1];
+    tempArr[1] = arr[(x - 1) * width + y];
+    tempArr[2] = arr[(x - 1) * width + y + 1];
+    tempArr[3] = arr[x * width + y - 1];
+    tempArr[4] = arr[x * width + y];
+    tempArr[5] = arr[x * width + y + 1];
+    tempArr[6] = arr[(x + 1) * width + y - 1];
+    tempArr[7] = arr[(x + 1) * width + y];
+    tempArr[8] = arr[(x + 1) * width + y + 1];
+    return tempArr;
 }
 
 function log(exp){

@@ -1,7 +1,8 @@
 // 获取标签
 var uploadImgBtn = getElem("uploadImgBtn"),
 	imgWindow = getElem("imgWindow"),
-	canvas = getElem("canvas");
+	canvas = getElem("canvas"),
+	coordinate = getElem("coordinate");
 
 // 设置常用变量
 const PI = Math.PI;
@@ -11,14 +12,21 @@ var context = canvas.getContext("2d"),
 	imgData = null,
 	reader = new FileReader(),
 	imgObj = new ImgDataObj(),
-	savedImg = new Image();
+	savedImg = new Image(),
+	backupImgData = null,
+	textFlag = false;
 
 // 获取按键
 var invertion = getElem("btnInvert"),
 	reliefImg = getElem("btnRelief"),
 	fogImg = getElem("btnFog"),
 	blurImg = getElem("btnBlur"),
-	horMirror = getElem("btnHorMirror");
+	horMirror = getElem("btnHorMirror"),
+	greyImg = getElem("btnGrey"),
+	recover = getElem("btnRecover"),
+	compress = getElem("btnCompress"),
+	medFilt = getElem("btnMedFilt"),
+	addText = getElem("btnAddText");
 
 uploadImgBtn.addEventListener("change", function(){
 	// 读取并显示上传的图片
@@ -29,12 +37,21 @@ uploadImgBtn.addEventListener("change", function(){
 });
 
 imgWindow.onload = function(){
-	canvas.width = canvasWidth;
-	canvas.height = canvasHeight;
+	canvas.width = imgWindow.width;
+	canvas.height = imgWindow.height;
 	context.drawImage(imgWindow, 0, 0);
 	imgData = context.getImageData(0, 0, imgWindow.width, imgWindow.height);		
 	imgObj.saveImgData(imgData);
-
+	backupImgData = imgData;
+	// 显示坐标
+	canvas.addEventListener("mousemove", function(e){
+		var pos = getPos(canvas, e);
+		coordinate.innerHTML = "坐标: (" + pos.x.toFixed(0) + "," + pos.y.toFixed(0) + ")";
+	});
+	// 清除坐标
+	canvas.addEventListener("mouseout", function(e){
+		coordinate.innerHTML = "";
+	});
 	// 添加按键功能
 	invertion.addEventListener("click", function(){
 		ImgProcessor.invertColor(imgObj);
@@ -47,15 +64,46 @@ imgWindow.onload = function(){
 	fogImg.addEventListener("click", function(){
 		ImgProcessor.fogEffect(imgObj);
 		updataCanvas();
-	}),
+	});
 	blurImg.addEventListener("click", function(){
 		ImgProcessor.blurEffect(imgObj);
 		updataCanvas();
-	}),
+	});
 	horMirror.addEventListener("click", function(){
 		ImgProcessor.reverseImg(imgObj);
 		updataCanvas();
+	});
+	greyImg.addEventListener("click", function(){
+		ImgProcessor.greyEffect(imgObj);
+		updataCanvas();
+	});
+	recover.addEventListener("click", function(){
+		imgObj.saveImgData(backupImgData);
+		updataCanvas();
+	});
+	compress.addEventListener("click", function(){
+		var value = window.prompt("请输入想要压缩的程度，范围在0.0——1.0之间");		
+		var comData = canvas.toDataURL("image/jpeg", parseFloat(value)).replace("image/png", "image/octet-stream");		
+		window.location.href=comData;
+	});
+	medFilt.addEventListener("click", function(){
+		ImgProcessor.medFilterEffect(imgObj);
+		updataCanvas();
+	});
+	addText.addEventListener("click", function(){
+		textFlag = true;
 	})
+	canvas.addEventListener("click", function(e){
+		if(textFlag){
+			var pos = getPos(canvas, e);
+			var word = window.prompt("请输入想要输入的文字");
+			context.fillStyle = "red";
+			context.fillText(word, pos.x, pos.y);
+			imgData = context.getImageData(0, 0, imgWindow.width, imgWindow.height);
+			imgObj.saveImgData(imgData);
+			textFlag = false;
+		}
+	});
 }
 
 // 兼容浏览器的添加事件对象
@@ -70,6 +118,15 @@ function getElem(tagID){
 function updataCanvas(){
 	imgData = imgObj.trans2ImgData(context);
 	context.putImageData(imgData, 0, 0)
+}
+// 获取canvas坐标的函数
+function getPos(can, e){
+	var rect = canvas.getBoundingClientRect(),
+		pos = null;
+	return pos = {
+		x : e.clientX - rect.left + 1,
+		y : e.clientY - rect.top
+	};
 }
 // 方便测试输出的函数
 function log(exp){
