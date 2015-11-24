@@ -163,7 +163,22 @@ ImgProcessor = {
 		for(var i = 0; i < ImgDataObj.rgba.length; i ++){
 			ImgDataObj.rgba[i] = medFilter(ImgDataObj.rgba[i], ImgDataObj.width, ImgDataObj.height);
 		}
-	}	
+	},
+	MirrorImg : function(can, cxt, imgData, imgObj, dir){
+		// 图片镜像
+		// 可选择水平镜像或垂直镜像		
+		if(dir == "hor"){
+			cxt.scale(-1, 1);
+			cxt.translate(-can.width, 0);
+		} else if(dir == "ver"){
+			cxt.scale(1, -1);
+			cxt.translate(0, -can.width);
+		}
+    	cxt.drawImage(can, 0, 0);
+    	// cxt.putImageData(imgData, 0, 0)
+    	imgData = context.getImageData(0, 0, can.width, can.height);
+    	imgObj.saveImgData(imgData);
+	}
 }
 
 // 公有化方便计算的函数

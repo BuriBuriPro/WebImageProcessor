@@ -26,7 +26,11 @@ var invertion = getElem("btnInvert"),
 	recover = getElem("btnRecover"),
 	compress = getElem("btnCompress"),
 	medFilt = getElem("btnMedFilt"),
-	addText = getElem("btnAddText");
+	addText = getElem("btnAddText"),
+	horMirror = getElem("btnHorMirror"),
+	verMirror = getElem("btnVerMirror");
+	// cutImg = getElem("btnCut"),
+	// cutInput = cutImg(cut)
 
 uploadImgBtn.addEventListener("change", function(){
 	// 读取并显示上传的图片
@@ -92,17 +96,23 @@ imgWindow.onload = function(){
 	});
 	addText.addEventListener("click", function(){
 		textFlag = true;
-	})
+	});
 	canvas.addEventListener("click", function(e){
 		if(textFlag){
 			var pos = getPos(canvas, e);
-			var word = window.prompt("请输入想要输入的文字");
+			var word = window.prompt("请输入想要输入的文字") || "";
 			context.fillStyle = "red";
 			context.fillText(word, pos.x, pos.y);
 			imgData = context.getImageData(0, 0, imgWindow.width, imgWindow.height);
 			imgObj.saveImgData(imgData);
 			textFlag = false;
 		}
+	});
+	horMirror.addEventListener("click", function(){
+		ImgProcessor.MirrorImg(canvas, context, imgData, imgObj, "hor");
+	});
+	verMirror.addEventListener("click", function(){
+		ImgProcessor.MirrorImg(canvas, context, imgData, imgObj, "ver");
 	});
 }
 
