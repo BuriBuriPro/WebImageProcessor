@@ -86,7 +86,7 @@ imgWindow.onload = function(){
 		updataCanvas();
 	});
 	compress.addEventListener("click", function(){
-		var value = window.prompt("请输入想要压缩的程度，范围在0.0——1.0之间");		
+		var value = window.prompt("请输入想要压缩的程度，范围在0.0——1.0之间") || 1;		
 		var comData = canvas.toDataURL("image/jpeg", parseFloat(value)).replace("image/png", "image/octet-stream");		
 		window.location.href=comData;
 	});
@@ -109,10 +109,10 @@ imgWindow.onload = function(){
 		}
 	});
 	horMirror.addEventListener("click", function(){
-		ImgProcessor.MirrorImg(canvas, context, imgData, imgObj, "hor");
+		ImgProcessor.MirrorImg(canvas, context, imgWindow, imgData, imgObj, "hor");
 	});
 	verMirror.addEventListener("click", function(){
-		ImgProcessor.MirrorImg(canvas, context, imgData, imgObj, "ver");
+		ImgProcessor.MirrorImg(canvas, context, imgWindow, imgData, imgObj, "ver");
 	});
 }
 
