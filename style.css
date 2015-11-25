@@ -38,3 +38,9 @@ html, body{
 }
 #screen #canvas{
 }
+#panel #insertL{
+	display: none;
+}
+#panel #btnInsert{
+	display: none;
+}

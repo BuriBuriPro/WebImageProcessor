@@ -14,7 +14,9 @@ var context = canvas.getContext("2d"),
 	imgObj = new ImgDataObj(),
 	savedImg = new Image(),
 	backupImgData = null,
-	textFlag = false;
+	textFlag = false,
+	insertFlag = false,
+	insertPos = null;
 
 // 获取按键
 var invertion = getElem("btnInvert"),
@@ -28,7 +30,11 @@ var invertion = getElem("btnInvert"),
 	medFilt = getElem("btnMedFilt"),
 	addText = getElem("btnAddText"),
 	horMirror = getElem("btnHorMirror"),
-	verMirror = getElem("btnVerMirror");
+	verMirror = getElem("btnVerMirror"),
+	rotate = getElem("btnRotate"),	
+	insert = getElem("btnInsert"),
+	insertL = getElem("insertL"),
+	insertPre = getElem("btnInsertPre");
 	// cutImg = getElem("btnCut"),
 	// cutInput = cutImg(cut)
 
@@ -106,13 +112,43 @@ imgWindow.onload = function(){
 			imgData = context.getImageData(0, 0, imgWindow.width, imgWindow.height);
 			imgObj.saveImgData(imgData);
 			textFlag = false;
-		}
+		}		
 	});
 	horMirror.addEventListener("click", function(){
 		ImgProcessor.MirrorImg(canvas, context, imgWindow, imgData, imgObj, "hor");
 	});
 	verMirror.addEventListener("click", function(){
 		ImgProcessor.MirrorImg(canvas, context, imgWindow, imgData, imgObj, "ver");
+	});
+	insertPre.addEventListener("click", function(){
+		insertL.style.cssText = "display: block;";
+		insertFlag = true;
+		// var insertPos = null;
+		alert("请在画布上点击选择想要插入图片的位置")
+		canvas.addEventListener("click", function(e){
+			if(insertFlag){
+				insertPos = getPos(canvas, e);	
+				alert("在左边点击上传插入的图片");	
+			}
+		});
+	});	
+	insert.addEventListener("click", function(e){	
+		if(!insertPos){
+			e.preventDefault();
+		} else{
+			insert.addEventListener("change", function(){
+			// 读取并插入上传的图片
+			reader.onload = function(){			
+				// imgWindow.src = reader.result;		
+				var tempImg = new Image();
+				tempImg.src = reader.result;
+				context.drawImage(tempImg, insertPos.x, insertPos.y);
+				insertPos = null;
+				insertFlag = false;
+			};
+			reader.readAsDataURL(this.files[0]);
+			});		
+		}		
 	});
 }
 

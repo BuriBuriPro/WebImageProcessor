@@ -1,3 +1,5 @@
+// const PI = Math.PI;
+
 // 创建ImgDataObj存放获取了RGBA的值的对象
 
 function ImgDataObj(){
@@ -12,7 +14,7 @@ function ImgDataObj(){
 	this.height = 0;
 	// 标记现在的RGBA是数组还是矩阵
 	this.flagAM = "array";
-	this.mirrorFlag = false;
+	this.mirrorFlag = false;	
 }
 
 // 存储canvas中图像数据的对象的一些公有方法
@@ -183,6 +185,9 @@ ImgProcessor = {
 			imgObj.saveImgData(imgData);
 			imgObj.mirrorFlag = false;
 		}
+	},
+	inserImg : function(){
+
 	}
 }
 
