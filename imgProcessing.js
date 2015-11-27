@@ -16,7 +16,8 @@ var context = canvas.getContext("2d"),
 	backupImgData = null,
 	textFlag = false,
 	insertFlag = false,
-	insertPos = null;
+	insertPos = null,
+	lightFlag = false;
 
 // 获取按键
 var invertion = getElem("btnInvert"),
@@ -34,9 +35,11 @@ var invertion = getElem("btnInvert"),
 	rotate = getElem("btnRotate"),	
 	insert = getElem("btnInsert"),
 	insertL = getElem("insertL"),
-	insertPre = getElem("btnInsertPre");
-	// cutImg = getElem("btnCut"),
-	// cutInput = cutImg(cut)
+	insertPre = getElem("btnInsertPre"),
+	mosaicImg = getElem("btnMosaic"),
+	oldImg = getElem("btnOld"),
+	sketchImg = getElem("btnSketch"),
+	lightImg = getElem("btnLight");
 
 uploadImgBtn.addEventListener("change", function(){
 	// 读取并显示上传的图片
@@ -68,6 +71,7 @@ imgWindow.onload = function(){
 		updataCanvas();
 	});
 	reliefImg.addEventListener("click", function(){
+		ImgProcessor.greyEffect(imgObj);
 		ImgProcessor.reliefEffect(imgObj);
 		updataCanvas();
 	});
@@ -96,10 +100,10 @@ imgWindow.onload = function(){
 		var comData = canvas.toDataURL("image/jpeg", parseFloat(value)).replace("image/png", "image/octet-stream");		
 		window.location.href=comData;
 	});
-	medFilt.addEventListener("click", function(){
-		ImgProcessor.medFilterEffect(imgObj);
-		updataCanvas();
-	});
+	// medFilt.addEventListener("click", function(){
+	// 	ImgProcessor.medFilterEffect(imgObj);
+	// 	updataCanvas();
+	// });
 	addText.addEventListener("click", function(){
 		textFlag = true;
 	});
@@ -149,6 +153,35 @@ imgWindow.onload = function(){
 			reader.readAsDataURL(this.files[0]);
 			});		
 		}		
+	});
+	mosaicImg.addEventListener("click", function(){
+		ImgProcessor.mosaicEffect(imgObj);
+		updataCanvas();
+	});
+	oldImg.addEventListener("click", function(){
+		ImgProcessor.oldEffect(imgObj);
+		updataCanvas();
+	});
+	sketchImg.addEventListener("click", function(){
+		var backupImgObj = new ImgDataObj();
+		ImgProcessor.greyEffect(imgObj);
+		backupImgObj.saveImgData(imgObj.trans2ImgData(context));
+		ImgProcessor.invertColor(backupImgObj);
+		ImgProcessor.blurEffect(backupImgObj);
+		ImgProcessor.sketchEffect(imgObj, backupImgObj);
+		updataCanvas();
+	});
+	lightImg.addEventListener("click", function(){
+		lightFlag = true;
+		canvas.addEventListener("click", function(e){
+			if(lightFlag){
+				insertPos = getPos(canvas, e);	
+				var value = parseInt(window.prompt("请输入添加光照的程度"));
+				ImgProcessor.lightEffect(imgObj, insertPos, value);
+				updataCanvas();
+				lightFlag = false;
+			}
+		});
 	});
 }
 

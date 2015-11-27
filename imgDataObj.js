@@ -160,13 +160,13 @@ ImgProcessor = {
 			ImgDataObj.rgba[2][i] = greyValue;
 		}
 	},
-	medFilterEffect : function(ImgDataObj){
-		// 中值滤波
-		this.checkNTrans(ImgDataObj, "array");
-		for(var i = 0; i < ImgDataObj.rgba.length; i ++){
-			ImgDataObj.rgba[i] = medFilter(ImgDataObj.rgba[i], ImgDataObj.width, ImgDataObj.height);
-		}
-	},
+	// medFilterEffect : function(ImgDataObj){
+	// 	// 中值滤波
+	// 	this.checkNTrans(ImgDataObj, "array");
+	// 	for(var i = 0; i < 3; i ++){
+	// 		ImgDataObj.rgba[i] = medFilter(ImgDataObj.rgba[i], ImgDataObj.width, ImgDataObj.height);
+	// 	}
+	// },
 	MirrorImg : function(can, cxt, img, imgData, imgObj, dir){
 		// 图片镜像
 		// 可选择水平镜像或垂直镜像	
@@ -186,9 +186,80 @@ ImgProcessor = {
 			imgObj.mirrorFlag = false;
 		}
 	},
-	inserImg : function(){
+	mosaicEffect : function(ImgDataObj){
+		// 马赛克效果
+		var resR = Array(ImgDataObj.rgba[0].length),
+			resG = Array(ImgDataObj.rgba[0].length),
+			resB = Array(ImgDataObj.rgba[0].length),
+			width = ImgDataObj.width,
+			height = ImgDataObj.height;
+		var neighborArr = Array(9);
+		for(var i = 1; i < height; i += 3){
+			for(var j = 1; j < width; j += 3){
+				var randNum = Math.floor(8 * Math.random());				
+				neighborArr = neighbor(ImgDataObj.rgba[0], width, i, j);
+				neighborCal(resR, neighborArr, randNum, width, i, j);
 
-	}
+				neighborArr = neighbor(ImgDataObj.rgba[1], width, i, j);
+				neighborCal(resG, neighborArr, randNum, width, i, j);
+
+				neighborArr = neighbor(ImgDataObj.rgba[2], width, i, j);
+				neighborCal(resB, neighborArr, randNum, width, i, j);				
+			}
+		}
+		ImgDataObj.rgba[0] = resR;
+		ImgDataObj.rgba[1] = resG;
+		ImgDataObj.rgba[2] = resB;
+	},
+	oldEffect : function(ImgDataObj){
+		// 老照片效果
+		this.checkNTrans(ImgDataObj, "array");				
+		for(var i = 0; i < ImgDataObj.length; i ++){
+			var value = 0;		
+			value = 0.393 * ImgDataObj.rgba[0][i]
+				    + 0.769 * ImgDataObj.rgba[1][i]
+				    + 0.189 * ImgDataObj.rgba[2][i];
+			ImgDataObj.rgba[0][i] = value;
+
+			value = 0.349 * ImgDataObj.rgba[0][i]
+					    + 0.686 * ImgDataObj.rgba[1][i]
+					    + 0.168 * ImgDataObj.rgba[2][i];
+			ImgDataObj.rgba[1][i] = value;
+
+			value = 0.272 * ImgDataObj.rgba[0][i]
+					    + 0.534 * ImgDataObj.rgba[1][i]
+					    + 0.131 * ImgDataObj.rgba[2][i];
+			ImgDataObj.rgba[2][i] = value;
+		}
+	},
+	sketchEffect : function(ImgDataObj1, ImgDataObj2){
+		
+		for(var i = 0; i < 3; i ++){
+			ImgDataObj1.rgba[i] = colorDoge(ImgDataObj1.rgba[i], ImgDataObj2.rgba[i], 0);
+		}
+	},
+	lightEffect : function(ImgDataObj, pos, val){
+		var width = ImgDataObj.width,
+			height = ImgDataObj.height;
+			rad = Math.min(pos.x, width - pos.x, pos.y, height - pos.y),
+			rat = 0,
+			a = 0,
+			b = 0;
+		log(rad)
+		for(var k = 0; k < 3; k ++){
+			for(var i = Math.round(pos.y) - rad; i < Math.round(pos.y) + rad; i ++){
+				for(var j = Math.round(pos.x) - rad; j < Math.round(pos.x) + rad; j ++){
+					a = Math.abs(j - pos.x);
+					b = Math.abs(i - pos.y);
+					rat = (a*a + b*b) / (rad * rad);					
+					if(rat < 1){
+						ImgDataObj.rgba[k][i * width + j] += (1 - rat) * val; 
+					}
+				}
+			}
+		}
+	},
+
 }
 
 // 公有化方便计算的函数
@@ -267,8 +338,7 @@ function blur(mat, width, height){
 	return tempMat;
 }
 function medFilter(arr, width, height){	
-	var med = 0,
-		tempArr = Array(9),
+	var tempArr = Array(9),
 		res = Array(width * height);
 	for(var i = 0; i < height; i ++){
 		for(var j = 0; j < width; j ++){
@@ -281,7 +351,7 @@ function medFilter(arr, width, height){
 				res[i * width + j] = tempArr[4];
 			}
 		}
-	}
+	}	
 	return res;
 }
 function neighbor(arr, width, x, y){
@@ -296,6 +366,24 @@ function neighbor(arr, width, x, y){
     tempArr[7] = arr[(x + 1) * width + y];
     tempArr[8] = arr[(x + 1) * width + y + 1];
     return tempArr;
+}
+function neighborCal(arr, arr2, target, width, x, y){
+	arr[(x - 1) * width + y - 1] = arr2[target];
+	arr[(x - 1) * width + y] = arr2[target];
+	arr[(x - 1) * width + y + 1] = arr2[target];
+	arr[x * width + y - 1] = arr2[target];
+	arr[x * width + y] = arr2[target];
+	arr[x * width + y + 1] = arr2[target];
+	arr[(x + 1) * width + y - 1] = arr2[target];
+	arr[(x + 1) * width + y] = arr2[target];
+	arr[(x + 1) * width + y + 1] = arr2[target];
+}
+function colorDoge(arr1, arr2, num){
+	var resArr = Array(arr1.length);
+	for(var i = 0; i < arr1.length; i ++){
+		resArr[i] =Math.min(num + arr1[i] + (arr1[i] * arr2[i]) / (255 - arr2[i]) , 255);
+	}
+	return resArr;
 }
 
 function log(exp){

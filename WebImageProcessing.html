@@ -15,13 +15,16 @@
 		<button id="btnHorMirror">水平镜像</button>
 		<button id="btnVerMirror">垂直镜像</button>		
 		<div class="imgEnhance">
-			<button id="btnMedFilt">中值滤波</button>
+			<!-- <button id="btnMedFilt">中值滤波</button> -->
 		</div>
 		<div class="imgEffect">
 			<button id="btnRelief">浮雕</button>
 			<button id="btnFog">雾化</button>
 			<button id="btnBlur">模糊</button>
 			<button id="btnGrey">灰度化</button>
+			<button id="btnMosaic">马赛克</button>
+			<button id="btnOld">老照片</button>
+			<button id="btnSketch">素描</button>
 			<button id="btnAddText">添加文字</button>
 		</div>
 		<button id="btnInsertPre">插入图片</button>
@@ -29,6 +32,7 @@
 			点击此处上传插入的图片
 			<input id="btnInsert" type="file"  />			
 		</label>
+		<button id="btnLight">添加光照</button>
 		<button id="btnCompress">压缩图片</button>
 		<button id="btnRecover">还原</button>
 	</div>	
@@ -40,10 +44,11 @@
 		<hr/>
 		<div>
 			<h2>操作画布</h2>
+			<div id="coordinate"></div>
 			<canvas id="canvas">
 				你的浏览器不支持此页面，请更换浏览器。
 			</canvas>
-			<div id="coordinate"></div>
+			
 		</div>
 	</div>
 
