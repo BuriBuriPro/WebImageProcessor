@@ -1,7 +1,4 @@
-// const PI = Math.PI;
-
 // 创建ImgDataObj存放获取了RGBA的值的对象
-
 function ImgDataObj(){
 	// 用数组存放RGBA，方便处理
 	var red = [],
@@ -160,13 +157,13 @@ ImgProcessor = {
 			ImgDataObj.rgba[2][i] = greyValue;
 		}
 	},
-	// medFilterEffect : function(ImgDataObj){
-	// 	// 中值滤波
-	// 	this.checkNTrans(ImgDataObj, "array");
-	// 	for(var i = 0; i < 3; i ++){
-	// 		ImgDataObj.rgba[i] = medFilter(ImgDataObj.rgba[i], ImgDataObj.width, ImgDataObj.height);
-	// 	}
-	// },
+	medFilterEffect : function(ImgDataObj){
+		// 中值滤波
+		this.checkNTrans(ImgDataObj, "array");
+		for(var i = 0; i < 3; i ++){
+			ImgDataObj.rgba[i] = medFilter(ImgDataObj.rgba[i], ImgDataObj.width, ImgDataObj.height);
+		}
+	},
 	MirrorImg : function(can, cxt, img, imgData, imgObj, dir){
 		// 图片镜像
 		// 可选择水平镜像或垂直镜像	
@@ -235,7 +232,7 @@ ImgProcessor = {
 	sketchEffect : function(ImgDataObj1, ImgDataObj2){
 		
 		for(var i = 0; i < 3; i ++){
-			ImgDataObj1.rgba[i] = colorDoge(ImgDataObj1.rgba[i], ImgDataObj2.rgba[i], 0);
+			ImgDataObj1.rgba[i] = colorDoge(ImgDataObj1.rgba[i], ImgDataObj2.rgba[i], -10);
 		}
 	},
 	lightEffect : function(ImgDataObj, pos, val){
@@ -259,7 +256,20 @@ ImgProcessor = {
 			}
 		}
 	},
-
+	HDREffect : function(ImgDataObj1, ImgDataObj2){
+		for(var i = 0; i < 3; i ++){
+			ImgDataObj1.rgba[i] = colorDoge2(ImgDataObj1.rgba[i], ImgDataObj2.rgba[i], 0);
+		}
+	},
+	laplaceEffect : function(ImgDataObj){
+		this.checkNTrans(ImgDataObj, "matrix");
+		for(var i = 0; i < 3; i ++){
+			ImgDataObj.rgba[i] = laplace(ImgDataObj.rgba[i], ImgDataObj.width, ImgDataObj.height);
+			ImgDataObj.rgba[i].width = ImgDataObj.width;
+			ImgDataObj.rgba[i].height = ImgDataObj.height;
+		}		
+		this.checkNTrans(ImgDataObj, "array");		
+	}
 }
 
 // 公有化方便计算的函数
@@ -337,6 +347,30 @@ function blur(mat, width, height){
 	}
 	return tempMat;
 }
+function laplace(mat, width, height){
+	var template = [0, -1, 0, -1, 4, -1, 0, -1, 0];
+	var tempMat = Array()
+	// 不处理边缘
+	for(var i = 0; i < height; i ++){
+		tempMat[i] = Array();
+		for(var j = 0; j < width; j ++){
+			if(j == 0 || j == width - 1 || i == 0 || i == height - 1){
+				tempMat[i][j] = mat[i][j];
+			} else{
+				tempMat[i][j] = mat[i - 1][j - 1] * template[0] + 
+								mat[i - 1][j] * template[1] +
+								mat[i - 1][j + 1] * template[2] +
+								mat[i][j - 1] * template[3] +
+								mat[i][j] * template[4] +
+								mat[i][j + 1] * template[5] +
+								mat[i + 1][j - 1] * template[6] +
+								mat[i + 1][j] * template[7] +
+								mat[i + 1][j + 1] * template[8];
+			}
+		}		
+	}
+	return tempMat;
+}
 function medFilter(arr, width, height){	
 	var tempArr = Array(9),
 		res = Array(width * height);
@@ -382,6 +416,13 @@ function colorDoge(arr1, arr2, num){
 	var resArr = Array(arr1.length);
 	for(var i = 0; i < arr1.length; i ++){
 		resArr[i] =Math.min(num + arr1[i] + (arr1[i] * arr2[i]) / (255 - arr2[i]) , 255);
+	}
+	return resArr;
+}
+function colorDoge2(arr1, arr2){
+	var resArr = Array(arr1.length);
+	for(var i = 0; i < arr1.length; i ++){
+		resArr[i] =Math.min(arr1[i] * arr1[i] / arr2[i], 255);
 	}
 	return resArr;
 }

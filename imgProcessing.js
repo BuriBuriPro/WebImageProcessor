@@ -39,7 +39,9 @@ var invertion = getElem("btnInvert"),
 	mosaicImg = getElem("btnMosaic"),
 	oldImg = getElem("btnOld"),
 	sketchImg = getElem("btnSketch"),
-	lightImg = getElem("btnLight");
+	lightImg = getElem("btnLight"),
+	hdrImg = getElem("btnHDR"),
+	sharpenImg = getElem("btnSharpen");
 
 uploadImgBtn.addEventListener("change", function(){
 	// 读取并显示上传的图片
@@ -100,10 +102,10 @@ imgWindow.onload = function(){
 		var comData = canvas.toDataURL("image/jpeg", parseFloat(value)).replace("image/png", "image/octet-stream");		
 		window.location.href=comData;
 	});
-	// medFilt.addEventListener("click", function(){
-	// 	ImgProcessor.medFilterEffect(imgObj);
-	// 	updataCanvas();
-	// });
+	medFilt.addEventListener("click", function(){
+		ImgProcessor.medFilterEffect(imgObj);
+		updataCanvas();
+	});
 	addText.addEventListener("click", function(){
 		textFlag = true;
 	});
@@ -182,6 +184,20 @@ imgWindow.onload = function(){
 				lightFlag = false;
 			}
 		});
+	});
+	hdrImg.addEventListener("click", function(){
+		var backupImgObj = new ImgDataObj();
+		backupImgObj.saveImgData(imgObj.trans2ImgData(context));
+		ImgProcessor.greyEffect(backupImgObj);		
+		// ImgProcessor.invertColor(backupImgObj);
+		// ImgProcessor.blurEffect(backupImgObj);
+		ImgProcessor.HDREffect(imgObj, backupImgObj);
+		// ImgProcessor.sketchEffect(backupImgObj, imgObj);
+		updataCanvas();
+	});
+	sharpenImg.addEventListener("click", function(){
+		ImgProcessor.laplaceEffect(imgObj);
+		updataCanvas();
 	});
 }
 
