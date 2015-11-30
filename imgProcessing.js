@@ -2,7 +2,8 @@
 var uploadImgBtn = getElem("uploadImgBtn"),
 	imgWindow = getElem("imgWindow"),
 	canvas = getElem("canvas"),
-	coordinate = getElem("coordinate");
+	coordinate = getElem("coordinate"),
+	panel = getElem("panel");
 
 // 设置常用变量
 const PI = Math.PI;
@@ -200,14 +201,20 @@ imgWindow.onload = function(){
 		updataCanvas();
 	});
 }
-
+// 设置工具盘panel随页面滚动而滚动
+window.onscroll = function(){
+	var scrollTop = document.body.scrollTop;
+	log(scrollTop)
+	panel.style.top = scrollTop + "px";
+	log(panel.style.top)
+}
 // 兼容浏览器的添加事件对象
 
 // 便于获取标签
 function getElem(tagID){
 	var temp = null;
 	temp = document.getElementById(tagID);
-	return temp
+	return temp;
 }
 // 更新canvas的函数
 function updataCanvas(){

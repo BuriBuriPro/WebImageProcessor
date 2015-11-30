@@ -11,15 +11,24 @@ html, body{
 	width: 200px;
 	background-color: silver;
 	float: left;	
+	overflow-y: scroll;
+	position: relative;
 }
 #panel label{
+	margin-top: 10px;
+	margin-left: 10px;
 	background-color: #AABBCC;
+	width: 150px;
+	display: block;
+	text-align: center;
 }
 #panel #uploadImgBtn{
 	display: none;
 }
 #panel button{
 	display: block;
+	width: 150px;
+	height: 30px;
 	margin-top: 10px;
 	margin-left: 10px;
 }
