@@ -1,3 +1,4 @@
+var template = null;
 // 创建ImgDataObj存放获取了RGBA的值的对象
 function ImgDataObj(){
 	// 用数组存放RGBA，方便处理
@@ -9,8 +10,6 @@ function ImgDataObj(){
 	this.length = 0;
 	this.width = 0;
 	this.height = 0;
-	// 标记现在的RGBA是数组还是矩阵
-	this.flagAM = "array";
 	this.mirrorFlag = false;	
 }
 
@@ -43,28 +42,6 @@ ImgDataObj.prototype = {
 		}
 		return tempImgData;
 	},
-	trans2Mat : function(){
-		// 把RGBA数据转换为矩阵
-		if(this.flagAM === "matrix"){
-			alert("目前已经是矩阵");
-			return;
-		}
-		for(var i = 0; i < 4; i ++){
-			this.rgba[i] = arr2Mat(this.rgba[i], this.width, this.height);
-		}
-		this.flagAM = "matrix";
-	},
-	trans2Arr : function(){
-		// 把RGBA数据转为一位数组
-		if(this.flagAM === "array"){
-			alert("目前已经是数组");
-			return;
-		}		
-		for(var i = 0; i < 4; i ++){
-			this.rgba[i] = mat2Arr(this.rgba[i]);
-		}					
-		this.flagAM = "array";
-	},
 	trans2Img : function(){
 		// 把canvas转换成img
 		var newImg = new Image();
@@ -73,51 +50,99 @@ ImgDataObj.prototype = {
 	}
 }
 
+
 // 处理图像的工具对象
-ImgProcessor = {
-	// 检测并转换数据格式
-	checkNTrans : function(ImgDataObj, flag){
-		if(flag != ImgDataObj.flagAM){
-			if(flag == "array"){
-				ImgDataObj.trans2Arr();
-			} else if(flag == "matrix"){
-				ImgDataObj.trans2Mat();
-			}
-		} else{}
-	},
-	// 翻转图像
-	reverseImg : function(ImgDataObj){	
-		this.checkNTrans(ImgDataObj, "array");	
+ImgProcessor = {	
+	reverseImg : function(ImgDataObj){		
+		// 翻转图像
 		for(var i = 0; i < 3; i ++){
-			// ImgDataObj.rgba[i].each(reverse();
 		}		
 	},
 	invertColor : function(ImgDataObj){
 		// 取反色
-		this.checkNTrans(ImgDataObj, "array");
+		function invert(arr){
+		// 取反
+		var i = 0;
+		for(;i < arr.length; i ++){
+			arr[i] = 255 - arr[i];
+			}				
+		}
 		for(var i = 0; i < 3; i ++){
 			invert(ImgDataObj.rgba[i]);
 		}
+	},	
+	medFilterEffect : function(ImgDataObj){
+		// 中值滤波			
+		function med(){
+			// 求中值
+			var neb = arguments[0];
+			neb.sort(function(a, b){
+				return a - b;
+			});	
+			var midNum = (neb.length + 1) / 2 - 1;
+			return neb[midNum];
+		}
+		for(var k = 0; k < 3; k ++){
+			ImgDataObj.rgba[k] = templateCal(ImgDataObj.rgba[k], null, ImgDataObj.width, ImgDataObj.height, 3, med);
+		}	
 	},
 	reliefEffect : function(ImgDataObj){
 		// 浮雕效果
-		this.checkNTrans(ImgDataObj, "matrix");		
-		for(var i = 0; i < 3; i ++){			
-			ImgDataObj.rgba[i] = relief(ImgDataObj.rgba[i], ImgDataObj.width, ImgDataObj.height);
-			ImgDataObj.rgba[i].width = ImgDataObj.width;
-			ImgDataObj.rgba[i].height = ImgDataObj.height;
+		template = [1, 0, 0, 0, -1, 0, 0, 0, 0];
+		function relief(){
+			var neb = arguments[0],
+				res = 0;
+			for(var n = 0; n < 9; n ++){
+				res += neb[n] * template[n]
+			}
+			return res * 2 + 128;
 		}
-		this.checkNTrans(ImgDataObj, "array");
+		ImgDataObj.rgba[0] = templateCal(ImgDataObj.rgba[0], template, ImgDataObj.width, ImgDataObj.height, 3, relief);
+		ImgDataObj.rgba[1] = ImgDataObj.rgba[0];
+		ImgDataObj.rgba[2] = ImgDataObj.rgba[0];
+		template = null;
+	},
+	blurEffect : function(ImgDataObj){
+		// 高斯模糊
+		template = [0.062467, 0.125, 0.062467, 0.125, 0.250131, 0.125, 0.062467, 0.125, 0.062467];		
+		function guass(){
+			var neb = arguments[0],
+				res = 0;
+			for(var n = 0; n < 9; n ++){
+				res += neb[n] * template[n]
+			}
+			return res;
+		}
+		for(var k = 0; k < 3; k ++){
+			ImgDataObj.rgba[k] = templateCal(ImgDataObj.rgba[k], template, ImgDataObj.width, ImgDataObj.height, 3, guass);
+		}
+		template = null;
+	},
+	laplaceEffect : function(ImgDataObj){
+		// 拉普拉斯锐化	
+		// template = [-1, -1, -1, -1, 9, -1, -1, -1, -1];
+		template = [0, -1, 0, -1, 5, -1, 0, -1, 0];
+		function laplace(){
+			var neb = arguments[0],
+				res = 0;
+			for(var n = 0; n < 9; n ++){
+				res += neb[n] * template[n]
+			}
+			return res;
+		}
+		for(var k = 0; k < 3; k ++){
+			ImgDataObj.rgba[k] = templateCal(ImgDataObj.rgba[k], template, ImgDataObj.width, ImgDataObj.height, 3, laplace);
+		}
+		template = null
 	},
 	fogEffect : function(ImgDataObj){
-		// 雾化效果
-		this.checkNTrans(ImgDataObj, "array");	
+		// 雾化效果	
 		var ran = 0,
 			tempArr1 = [],
 			tempArr2 = [],
 			tempArr3 = [];
-		for(var i = 0; i < ImgDataObj.rgba[0].length; i ++){
-			ran = Math.floor(10 * Math.random()) * Math.floor(3 * Math.random() - 1);
+		for(var i = 0; i < ImgDataObj.length; i ++){
+			ran = Math.floor(8 * Math.random()) * Math.floor(3 * Math.random() - 1);
 			if(i + ran >= 0 && i + ran < ImgDataObj.length){
 				tempArr1[i] = ImgDataObj.rgba[0][i + ran];
 				tempArr2[i] = ImgDataObj.rgba[1][i + ran];
@@ -132,21 +157,9 @@ ImgProcessor = {
 		ImgDataObj.rgba[1] = tempArr2;
 		ImgDataObj.rgba[2] = tempArr3;
 	},
-	blurEffect : function(ImgDataObj){
-		// 高斯模糊
-		this.checkNTrans(ImgDataObj, "matrix");
-		for(var i = 0; i < 3; i ++){
-			ImgDataObj.rgba[i] = blur(ImgDataObj.rgba[i], ImgDataObj.width, ImgDataObj.height);
-			ImgDataObj.rgba[i].width = ImgDataObj.width;
-			ImgDataObj.rgba[i].height = ImgDataObj.height;
-		}		
-		this.checkNTrans(ImgDataObj, "array");		
-	},
 	greyEffect : function(ImgDataObj){
 		// 灰度化
-		this.checkNTrans(ImgDataObj, "array");
 		// 加权平均法处理rgb
-		// var greyValue = Array(ImgDataObj.length);
 		for(var i = 0; i < ImgDataObj.length; i ++){
 			var greyValue = 0;		
 			greyValue = 0.3 * ImgDataObj.rgba[0][i]
@@ -155,13 +168,6 @@ ImgProcessor = {
 			ImgDataObj.rgba[0][i] = greyValue;
 			ImgDataObj.rgba[1][i] = greyValue;
 			ImgDataObj.rgba[2][i] = greyValue;
-		}
-	},
-	medFilterEffect : function(ImgDataObj){
-		// 中值滤波
-		this.checkNTrans(ImgDataObj, "array");
-		for(var i = 0; i < 3; i ++){
-			ImgDataObj.rgba[i] = medFilter(ImgDataObj.rgba[i], ImgDataObj.width, ImgDataObj.height);
 		}
 	},
 	MirrorImg : function(can, cxt, img, imgData, imgObj, dir){
@@ -185,32 +191,39 @@ ImgProcessor = {
 	},
 	mosaicEffect : function(ImgDataObj){
 		// 马赛克效果
-		var resR = Array(ImgDataObj.rgba[0].length),
-			resG = Array(ImgDataObj.rgba[0].length),
-			resB = Array(ImgDataObj.rgba[0].length),
-			width = ImgDataObj.width,
-			height = ImgDataObj.height;
-		var neighborArr = Array(9);
-		for(var i = 1; i < height; i += 3){
-			for(var j = 1; j < width; j += 3){
-				var randNum = Math.floor(8 * Math.random());				
-				neighborArr = neighbor(ImgDataObj.rgba[0], width, i, j);
-				neighborCal(resR, neighborArr, randNum, width, i, j);
-
-				neighborArr = neighbor(ImgDataObj.rgba[1], width, i, j);
-				neighborCal(resG, neighborArr, randNum, width, i, j);
-
-				neighborArr = neighbor(ImgDataObj.rgba[2], width, i, j);
-				neighborCal(resB, neighborArr, randNum, width, i, j);				
+		var resR = Array(ImgDataObj.length),
+			resG = Array(ImgDataObj.length),
+			resB = Array(ImgDataObj.length),
+			w = ImgDataObj.width,
+			h = ImgDataObj.height,
+			nebW = 15,
+			nebH = 15;
+		function mosaic(arr, neb, randNum, width, x, y){
+			var res = neb[randNum];
+			for(var m = x - Math.floor(nebW / 2); m < Math.floor(nebW / 2) + x + 1; m ++){
+				for(var n = y - Math.floor(nebW / 2); n < Math.floor(nebW / 2) + y + 1; n ++){
+					arr[m * width + n] = res;
+				}
 			}
 		}
+		for(var i = Math.floor(nebW / 2); i < h - Math.floor(nebW / 2); i += Math.floor(nebW / 2)){
+			for(var j = Math.floor(nebW / 2); j < w - Math.floor(nebW / 2); j += Math.floor(nebW / 2)){			
+				var randNum = Math.floor((nebW * nebW - 1) * Math.random());				
+				neb = neighbor(ImgDataObj.rgba[0], ImgDataObj.width, ImgDataObj.height, nebW, nebH, i, j);
+				mosaic(resR, neb, randNum, w, i, j);
+				neb = neighbor(ImgDataObj.rgba[1], ImgDataObj.width, ImgDataObj.height, nebW, nebH, i, j);
+				mosaic(resG, neb, randNum, w, i, j);
+				neb = neighbor(ImgDataObj.rgba[2], ImgDataObj.width, ImgDataObj.height, nebW, nebH, i, j);
+				mosaic(resB, neb, randNum, w, i, j);				
+			}
+		}		
 		ImgDataObj.rgba[0] = resR;
 		ImgDataObj.rgba[1] = resG;
 		ImgDataObj.rgba[2] = resB;
 	},
 	oldEffect : function(ImgDataObj){
 		// 老照片效果
-		this.checkNTrans(ImgDataObj, "array");				
+		// this.checkNTrans(ImgDataObj, "array");				
 		for(var i = 0; i < ImgDataObj.length; i ++){
 			var value = 0;		
 			value = 0.393 * ImgDataObj.rgba[0][i]
@@ -229,8 +242,7 @@ ImgProcessor = {
 			ImgDataObj.rgba[2][i] = value;
 		}
 	},
-	sketchEffect : function(ImgDataObj1, ImgDataObj2){
-		
+	sketchEffect : function(ImgDataObj1, ImgDataObj2){		
 		for(var i = 0; i < 3; i ++){
 			ImgDataObj1.rgba[i] = colorDoge(ImgDataObj1.rgba[i], ImgDataObj2.rgba[i], -10);
 		}
@@ -242,7 +254,6 @@ ImgProcessor = {
 			rat = 0,
 			a = 0,
 			b = 0;
-		log(rad)
 		for(var k = 0; k < 3; k ++){
 			for(var i = Math.round(pos.y) - rad; i < Math.round(pos.y) + rad; i ++){
 				for(var j = Math.round(pos.x) - rad; j < Math.round(pos.x) + rad; j ++){
@@ -260,157 +271,42 @@ ImgProcessor = {
 		for(var i = 0; i < 3; i ++){
 			ImgDataObj1.rgba[i] = colorDoge2(ImgDataObj1.rgba[i], ImgDataObj2.rgba[i], 0);
 		}
-	},
-	laplaceEffect : function(ImgDataObj){
-		this.checkNTrans(ImgDataObj, "matrix");
-		for(var i = 0; i < 3; i ++){
-			ImgDataObj.rgba[i] = laplace(ImgDataObj.rgba[i], ImgDataObj.width, ImgDataObj.height);
-			ImgDataObj.rgba[i].width = ImgDataObj.width;
-			ImgDataObj.rgba[i].height = ImgDataObj.height;
-		}		
-		this.checkNTrans(ImgDataObj, "array");		
 	}
 }
 
-// 公有化方便计算的函数
-function arr2Mat(arr, width, height){
-	// 把数组转换成矩阵
-	// 矩阵有宽高属性
-			var i, j,
-				mat = Array();			
-			for(i = 0; i < height; i ++){
-				mat[i] = Array();								
-				for(j = 0; j < width; j ++){
-					mat[i][j] = arr[i * width + j];
-				}
-			}
-			mat.width = width;
-			mat.height = height;
-			return mat;
-		}
-function mat2Arr(mat){
-	// 把矩阵转换成数组
-	var i , j
-		arr = Array();
-	for(i = 0; i < mat.height; i ++){				
-		for(j = 0; j < mat.width; j ++){
-			arr[i * mat.width + j] = mat[i][j];
-		}
-	}
-	return arr;
-}
-function invert(arr){
-	// 取反
-	var i = 0;
-	for(;i < arr.length; i ++){
-		arr[i] = 255 - arr[i];
-	}				
-}
-function relief(mat, width, height){
-	// 实现矩阵对角相减的函数
-	var i, j;
-	var tempMat = Array();
-	for(i = 0; i < height; i ++){
-		tempMat[i] = Array();
-		for(j = 0; j < width; j ++){
-			if(j == width - 1 || i == height - 1){
-				tempMat[i][j] = mat[i][j];
-			} else{				
-				tempMat[i][j] = mat[i][j] - mat[i+1][j+1] + 128;
-			}
-		}
-	}
-	return tempMat;
-}
-function blur(mat, width, height){
-	// σ=1.5时 高斯模板的权重
-	var template = [0.0947, 0.118, 0.0947, 0.118, 0.1477, 0.118, 0.0947, 0.118, 0.0947];
-	var tempMat = Array()
-	// 不处理边缘
-	for(var i = 0; i < height; i ++){
-		tempMat[i] = Array();
-		for(var j = 0; j < width; j ++){
-			if(j == 0 || j == width - 1 || i == 0 || i == height - 1){
-				tempMat[i][j] = mat[i][j];
+// 矩阵卷积运算/模板运算
+// 传入数组，模板，数组宽，数组高，模板宽，模板高，要用的算法
+function templateCal(arr, template, arrW, arrH, tempeW, fun){				
+	var result = Array();
+	var pos = 0;
+	var neb = [];
+	for(var i = 0; i < arrH; i ++){
+		for(var j = 0; j < arrW; j ++){
+			// 不处理边缘
+			if(i < Math.floor(tempeW / 2) || i > arrH - Math.floor(tempeW / 2) - 1 || j < Math.floor(tempeW / 2) || j > arrW - Math.floor(tempeW / 2) - 1){
+				result[i * arrW + j] = arr[i * arrW + j];
 			} else{
-				tempMat[i][j] = mat[i - 1][j - 1] * template[0] + 
-								mat[i - 1][j] * template[1] +
-								mat[i - 1][j + 1] * template[2] +
-								mat[i][j - 1] * template[3] +
-								mat[i][j] * template[4] +
-								mat[i][j + 1] * template[5] +
-								mat[i + 1][j - 1] * template[6] +
-								mat[i + 1][j] * template[7] +
-								mat[i + 1][j + 1] * template[8];
-			}
-		}		
-	}
-	return tempMat;
-}
-function laplace(mat, width, height){
-	var template = [0, -1, 0, -1, 4, -1, 0, -1, 0];
-	var tempMat = Array()
-	// 不处理边缘
-	for(var i = 0; i < height; i ++){
-		tempMat[i] = Array();
-		for(var j = 0; j < width; j ++){
-			if(j == 0 || j == width - 1 || i == 0 || i == height - 1){
-				tempMat[i][j] = mat[i][j];
-			} else{
-				tempMat[i][j] = mat[i - 1][j - 1] * template[0] + 
-								mat[i - 1][j] * template[1] +
-								mat[i - 1][j + 1] * template[2] +
-								mat[i][j - 1] * template[3] +
-								mat[i][j] * template[4] +
-								mat[i][j + 1] * template[5] +
-								mat[i + 1][j - 1] * template[6] +
-								mat[i + 1][j] * template[7] +
-								mat[i + 1][j + 1] * template[8];
-			}
-		}		
-	}
-	return tempMat;
-}
-function medFilter(arr, width, height){	
-	var tempArr = Array(9),
-		res = Array(width * height);
-	for(var i = 0; i < height; i ++){
-		for(var j = 0; j < width; j ++){
-			if(i == 0 || i == height - 1 || j == 0 || j == width - 1){
-				// 不处理边缘
-				res[i * width + j] = arr[i * width + j];
-			} else{
-				tempArr = neighbor(arr, width, i, j);
-				tempArr.sort();
-				res[i * width + j] = tempArr[4];
+				// 非边缘部分
+				// 按模板的宽高获取邻域
+				neb = neighbor(arr, arrW, arrH, tempeW, i, j);
+				result[i * arrW + j] = fun(neb, template, arrW, arrH, tempeW);
 			}
 		}
-	}	
-	return res;
+	}
+	return result;
 }
-function neighbor(arr, width, x, y){
-    var tempArr = [];
-    tempArr[0] = arr[(x - 1) * width + y - 1];
-    tempArr[1] = arr[(x - 1) * width + y];
-    tempArr[2] = arr[(x - 1) * width + y + 1];
-    tempArr[3] = arr[x * width + y - 1];
-    tempArr[4] = arr[x * width + y];
-    tempArr[5] = arr[x * width + y + 1];
-    tempArr[6] = arr[(x + 1) * width + y - 1];
-    tempArr[7] = arr[(x + 1) * width + y];
-    tempArr[8] = arr[(x + 1) * width + y + 1];
-    return tempArr;
-}
-function neighborCal(arr, arr2, target, width, x, y){
-	arr[(x - 1) * width + y - 1] = arr2[target];
-	arr[(x - 1) * width + y] = arr2[target];
-	arr[(x - 1) * width + y + 1] = arr2[target];
-	arr[x * width + y - 1] = arr2[target];
-	arr[x * width + y] = arr2[target];
-	arr[x * width + y + 1] = arr2[target];
-	arr[(x + 1) * width + y - 1] = arr2[target];
-	arr[(x + 1) * width + y] = arr2[target];
-	arr[(x + 1) * width + y + 1] = arr2[target];
+// 获取邻域的操作
+function neighbor(arr, arrW, arrH, tempeW, x, y){
+	var neb = Array(tempeW * tempeW);
+	var n = 0;
+	var pos2 = 0;
+	for(var i2 = x - Math.floor(tempeW / 2); i2 < Math.floor(tempeW / 2) + x + 1; i2 ++){
+		for(var j2 = y - Math.floor(tempeW / 2); j2 < Math.floor(tempeW / 2) + y + 1; j2 ++){
+			pos2 = i2 * arrH + j2;
+			neb[n ++] = arr[pos2];				
+		}
+	}		
+	return neb;
 }
 function colorDoge(arr1, arr2, num){
 	var resArr = Array(arr1.length);

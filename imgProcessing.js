@@ -53,6 +53,8 @@ uploadImgBtn.addEventListener("change", function(){
 });
 
 imgWindow.onload = function(){
+	log(imgWindow.width);
+	log(imgWindow.height);
 	canvas.width = imgWindow.width;
 	canvas.height = imgWindow.height;
 	context.drawImage(imgWindow, 0, 0);
@@ -96,7 +98,7 @@ imgWindow.onload = function(){
 	});
 	recover.addEventListener("click", function(){
 		imgObj.saveImgData(backupImgData);
-		updataCanvas();
+		context.putImageData(backupImgData, 0, 0)
 	});
 	compress.addEventListener("click", function(){
 		var value = window.prompt("请输入想要压缩的程度，范围在0.0——1.0之间") || 1;		
@@ -197,6 +199,9 @@ imgWindow.onload = function(){
 		updataCanvas();
 	});
 	sharpenImg.addEventListener("click", function(){
+		// ImgProcessor.medFilterEffect(imgObj);
+		ImgProcessor.blurEffect(imgObj);
+		// ImgProcessor.medFilterEffect(imgObj);
 		ImgProcessor.laplaceEffect(imgObj);
 		updataCanvas();
 	});
@@ -204,9 +209,7 @@ imgWindow.onload = function(){
 // 设置工具盘panel随页面滚动而滚动
 window.onscroll = function(){
 	var scrollTop = document.body.scrollTop;
-	log(scrollTop)
 	panel.style.top = scrollTop + "px";
-	log(panel.style.top)
 }
 // 兼容浏览器的添加事件对象
 
