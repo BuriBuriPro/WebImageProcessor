@@ -196,8 +196,7 @@ ImgProcessor = {
 			resB = Array(ImgDataObj.length),
 			w = ImgDataObj.width,
 			h = ImgDataObj.height,
-			nebW = 15,
-			nebH = 15;
+			nebW = 15;
 		function mosaic(arr, neb, randNum, width, x, y){
 			var res = neb[randNum];
 			for(var m = x - Math.floor(nebW / 2); m < Math.floor(nebW / 2) + x + 1; m ++){
@@ -209,11 +208,11 @@ ImgProcessor = {
 		for(var i = Math.floor(nebW / 2); i < h - Math.floor(nebW / 2); i += Math.floor(nebW / 2)){
 			for(var j = Math.floor(nebW / 2); j < w - Math.floor(nebW / 2); j += Math.floor(nebW / 2)){			
 				var randNum = Math.floor((nebW * nebW - 1) * Math.random());				
-				neb = neighbor(ImgDataObj.rgba[0], ImgDataObj.width, ImgDataObj.height, nebW, nebH, i, j);
+				neb = neighbor(ImgDataObj.rgba[0], ImgDataObj.width, ImgDataObj.height, nebW, i, j);
 				mosaic(resR, neb, randNum, w, i, j);
-				neb = neighbor(ImgDataObj.rgba[1], ImgDataObj.width, ImgDataObj.height, nebW, nebH, i, j);
+				neb = neighbor(ImgDataObj.rgba[1], ImgDataObj.width, ImgDataObj.height, nebW, i, j);
 				mosaic(resG, neb, randNum, w, i, j);
-				neb = neighbor(ImgDataObj.rgba[2], ImgDataObj.width, ImgDataObj.height, nebW, nebH, i, j);
+				neb = neighbor(ImgDataObj.rgba[2], ImgDataObj.width, ImgDataObj.height, nebW, i, j);
 				mosaic(resB, neb, randNum, w, i, j);				
 			}
 		}		

@@ -200,8 +200,6 @@ imgWindow.onload = function(){
 	});
 	sharpenImg.addEventListener("click", function(){
 		// ImgProcessor.medFilterEffect(imgObj);
-		ImgProcessor.blurEffect(imgObj);
-		// ImgProcessor.medFilterEffect(imgObj);
 		ImgProcessor.laplaceEffect(imgObj);
 		updataCanvas();
 	});
