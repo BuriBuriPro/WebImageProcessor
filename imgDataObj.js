@@ -289,7 +289,7 @@ function templateCal(arr, template, arrW, arrH, tempeW, fun){
 				// 非边缘部分
 				// 按模板的宽高获取邻域
 				neb = neighbor(arr, arrW, arrH, tempeW, i, j);
-				result[i * arrW + j] = fun(neb, template, arrW, arrH, tempeW);
+				result[i * arrW + j] = Math.round(fun(neb));
 			}
 		}
 	}
@@ -302,7 +302,7 @@ function neighbor(arr, arrW, arrH, tempeW, x, y){
 	var pos2 = 0;
 	for(var i2 = x - Math.floor(tempeW / 2); i2 < Math.floor(tempeW / 2) + x + 1; i2 ++){
 		for(var j2 = y - Math.floor(tempeW / 2); j2 < Math.floor(tempeW / 2) + y + 1; j2 ++){
-			pos2 = i2 * arrH + j2;
+			pos2 = i2 * arrW + j2;
 			neb[n ++] = arr[pos2];				
 		}
 	}		
