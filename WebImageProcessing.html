@@ -11,38 +11,28 @@
 			点击此处上传图片
 			<input id="uploadImgBtn" type="file"  />			
 		</label>	
-		<div class="imgControl">
-			<button id="btnHorMirror">水平镜像</button>
-			<button id="btnVerMirror">垂直镜像</button>		
-		</div>		
-		<div class="imgEffect">		
-			<button id="btnInvert">颜色取反</button>
-			<button id="btnRelief">浮雕</button>
-			<button id="btnFog">雾化</button>
-			<button id="btnBlur">模糊</button>
-			<button id="btnGrey">灰度化</button>
-			<button id="btnMosaic">马赛克</button>
-			<button id="btnOld">老照片</button>
-			<button id="btnSketch">素描</button>
-			<button id="btnMedFilt">中值滤波</button>
-			<button id="btnSharpen">锐化</button>
-			<button id="btnPaint">油画效果</button>
-			<!-- 以下效果存在问题 -->
-			<button id="btnHDR">增大对比度</button>
-		</div>
-		<div class="imgModified">
-			<!-- 缺少样式控制 -->
-			<button id="btnAddText">添加文字</button>
-			<!-- 想加个控制透明度和大小 -->
-			<button id="btnInsertPre">插入图片</button>
-			<label id="insertL">			
-				点击此处上传插入的图片
-				<input id="btnInsert" type="file"  />			
-			</label>
-			<!-- 添加设置半径 -->
-			<button id="btnLight">添加光照</button>
-			<button id="btnCompress">压缩图片</button>
-		</div>		
+		<button id="btnHorMirror">水平镜像</button>
+		<button id="btnVerMirror">垂直镜像</button>			
+		<button id="btnInvert">颜色取反</button>
+		<button id="btnGrey">灰度化</button>
+		<button id="btnRelief">浮雕</button>
+		<button id="btnOld">老照片</button>
+		<button id="btnSketch">素描</button>
+		<button id="btnMedFilt">中值滤波</button>
+		<button id="btnSharpen">锐化</button>
+		<button id="btnFog">雾化</button>
+		<button id="btnBlur">模糊</button>		
+		<button id="btnMosaic">马赛克</button>
+		<button id="btnPaint">油画效果</button>
+		<button id="btnTurbo">增大对比度</button>		
+		<button id="btnLight">添加光照</button>
+		<button id="btnAddText">添加文字</button>
+		<button id="btnInsertPre">插入图片</button>
+		<label id="insertL">			
+			点此上传插入的图片
+			<input id="btnInsert" type="file"  />			
+		</label>
+		<button id="btnCompress">压缩图片</button>
 		<button id="btnRecover">还原</button>
 	</div>	
 	<div id="screen">
@@ -64,7 +54,7 @@
 	<div id="tips">
 		<p id="tipCoor"></p>
 		<p id="tipCondition">正在处理当中</p>
-		<p id="tipControl">aaaaaaaa</p>
+		<p id="tipControl"></p>
 	</div>
 	<div id="mask"></div>
 </body>

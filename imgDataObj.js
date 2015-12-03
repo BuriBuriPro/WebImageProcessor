@@ -50,14 +50,8 @@ ImgDataObj.prototype = {
 	}
 }
 
-
 // 处理图像的工具对象
-ImgProcessor = {	
-	reverseImg : function(ImgDataObj){		
-		// 翻转图像
-		for(var i = 0; i < 3; i ++){
-		}		
-	},
+ImgProcessor = {
 	invertColor : function(ImgDataObj){
 		// 取反色
 		function invert(arr){
@@ -190,14 +184,14 @@ ImgProcessor = {
 			imgObj.mirrorFlag = false;
 		}
 	},
-	mosaicEffect : function(ImgDataObj){
+	mosaicEffect : function(ImgDataObj, val){
 		// 马赛克效果
 		var resR = Array(ImgDataObj.length),
 			resG = Array(ImgDataObj.length),
 			resB = Array(ImgDataObj.length),
 			w = ImgDataObj.width,
 			h = ImgDataObj.height,
-			nebW = 10;
+			nebW = val;
 		function mosaic(arr, neb, randNum, width, x, y){
 			var res = neb[randNum];
 			for(var m = x - Math.floor(nebW / 2); m < Math.floor(nebW / 2) + x + 1; m ++){
