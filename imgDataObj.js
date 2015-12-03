@@ -89,12 +89,13 @@ ImgProcessor = {
 	reliefEffect : function(ImgDataObj){
 		// 浮雕效果
 		template = [1, 0, 0, 0, -1, 0, 0, 0, 0];
+		// template = [-6, -3, 0, -3, -1, 3, 0, 3, 6];
 		function relief(){
 			var neb = arguments[0],
 				res = 0;
 			for(var n = 0; n < 9; n ++){
-				res += neb[n] * template[n]
-			}
+				res += neb[n] * template[n];
+			}			
 			return res * 2 + 128;
 		}
 		ImgDataObj.rgba[0] = templateCal(ImgDataObj.rgba[0], template, ImgDataObj.width, ImgDataObj.height, 3, relief);
@@ -196,7 +197,7 @@ ImgProcessor = {
 			resB = Array(ImgDataObj.length),
 			w = ImgDataObj.width,
 			h = ImgDataObj.height,
-			nebW = 15;
+			nebW = 10;
 		function mosaic(arr, neb, randNum, width, x, y){
 			var res = neb[randNum];
 			for(var m = x - Math.floor(nebW / 2); m < Math.floor(nebW / 2) + x + 1; m ++){
@@ -243,7 +244,7 @@ ImgProcessor = {
 	},
 	sketchEffect : function(ImgDataObj1, ImgDataObj2){		
 		for(var i = 0; i < 3; i ++){
-			ImgDataObj1.rgba[i] = colorDoge(ImgDataObj1.rgba[i], ImgDataObj2.rgba[i], -10);
+			ImgDataObj1.rgba[i] = colorDoge(ImgDataObj1.rgba[i], ImgDataObj2.rgba[i]);
 		}
 	},
 	lightEffect : function(ImgDataObj, pos, val){
@@ -307,10 +308,10 @@ function neighbor(arr, arrW, arrH, tempeW, x, y){
 	}		
 	return neb;
 }
-function colorDoge(arr1, arr2, num){
+function colorDoge(arr1, arr2){
 	var resArr = Array(arr1.length);
 	for(var i = 0; i < arr1.length; i ++){
-		resArr[i] =Math.min(num + arr1[i] + (arr1[i] * arr2[i]) / (255 - arr2[i]) , 255);
+		resArr[i] =Math.min(arr1[i] + (arr1[i] * arr2[i]) / (255 - arr2[i]) , 230);
 	}
 	return resArr;
 }
