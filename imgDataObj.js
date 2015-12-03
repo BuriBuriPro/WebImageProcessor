@@ -136,14 +136,14 @@ ImgProcessor = {
 		}
 		template = null
 	},
-	fogEffect : function(ImgDataObj){
+	fogEffect : function(ImgDataObj, range){
 		// 雾化效果	
 		var ran = 0,
 			tempArr1 = [],
 			tempArr2 = [],
 			tempArr3 = [];
 		for(var i = 0; i < ImgDataObj.length; i ++){
-			ran = Math.floor(8 * Math.random()) * Math.floor(3 * Math.random() - 1);
+			ran = Math.floor(range * Math.random()) * Math.floor(3 * Math.random() - 1);
 			if(i + ran >= 0 && i + ran < ImgDataObj.length){
 				tempArr1[i] = ImgDataObj.rgba[0][i + ran];
 				tempArr2[i] = ImgDataObj.rgba[1][i + ran];
@@ -244,7 +244,7 @@ ImgProcessor = {
 	},
 	sketchEffect : function(ImgDataObj1, ImgDataObj2){		
 		for(var i = 0; i < 3; i ++){
-			ImgDataObj1.rgba[i] = colorDoge(ImgDataObj1.rgba[i], ImgDataObj2.rgba[i]);
+			ImgDataObj1.rgba[i] = colorOverlay(ImgDataObj1.rgba[i], ImgDataObj2.rgba[i], "doge");
 		}
 	},
 	lightEffect : function(ImgDataObj, pos, val){
@@ -269,7 +269,7 @@ ImgProcessor = {
 	},
 	HDREffect : function(ImgDataObj1, ImgDataObj2){
 		for(var i = 0; i < 3; i ++){
-			ImgDataObj1.rgba[i] = colorDoge2(ImgDataObj1.rgba[i], ImgDataObj2.rgba[i], 0);
+			ImgDataObj1.rgba[i] = colorOverlay(ImgDataObj1.rgba[i], ImgDataObj2.rgba[i], "overlay");
 		}
 	}
 }
@@ -308,17 +308,19 @@ function neighbor(arr, arrW, arrH, tempeW, x, y){
 	}		
 	return neb;
 }
-function colorDoge(arr1, arr2){
+function colorOverlay(arr1, arr2, mode){
 	var resArr = Array(arr1.length);
-	for(var i = 0; i < arr1.length; i ++){
-		resArr[i] =Math.min(arr1[i] + (arr1[i] * arr2[i]) / (255 - arr2[i]) , 230);
-	}
-	return resArr;
-}
-function colorDoge2(arr1, arr2){
-	var resArr = Array(arr1.length);
-	for(var i = 0; i < arr1.length; i ++){
-		resArr[i] =Math.min(arr1[i] * arr1[i] / arr2[i], 255);
+	switch (mode) {
+		case "doge" :
+			for(var i = 0; i < arr1.length; i ++){
+				resArr[i] =Math.min(arr1[i] + (arr1[i] * arr2[i]) / (255 - arr2[i]) , 230);
+			}
+			break;
+		case "overlay" : 
+			for(var i = 0; i < arr1.length; i ++){
+				resArr[i] =Math.min(arr1[i] * arr1[i] / arr2[i], 255);
+			}
+			break;
 	}
 	return resArr;
 }
