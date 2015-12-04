@@ -274,7 +274,6 @@ imgWindow.onload = function(){
 					value = Math.min(parseInt(value) * 3 || 3, 15);
 					if(value % 2 == 0)
 						value ++;
-					log(value);
 					ImgProcessor.avgFilterEffect(imgObj, value);
 					updataCanvas();
 				}
@@ -307,7 +306,16 @@ imgWindow.onload = function(){
 					}
 				}
 			});			
-		});		
+		});	
+		paintImg.addEventListener("click", function(){
+			//油画风格
+			dealing(paintImg, function(){
+				clearFlag();
+				ImgProcessor.fogEffect(imgObj, 5);
+				ImgProcessor.medFilterEffect(imgObj, 3);
+				updataCanvas();
+			});			
+		});	
 		sharpenImg.addEventListener("click", function(){
 			// 锐化效果——拉普拉斯锐化
 			dealing(sharpenImg, function(){
@@ -342,15 +350,6 @@ imgWindow.onload = function(){
 				ImgProcessor.turboEffect(imgObj, backupImgObj);
 				updataCanvas();
 			});				
-		});
-		paintImg.addEventListener("click", function(){
-			//油画风格
-			dealing(paintImg, function(){
-				clearFlag();
-				ImgProcessor.fogEffect(imgObj, 5);
-				ImgProcessor.medFilterEffect(imgObj, 3);
-				updataCanvas();
-			});			
 		});
 		// 添加操作		
 		// 添加光源
