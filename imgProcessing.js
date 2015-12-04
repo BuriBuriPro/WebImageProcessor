@@ -95,7 +95,10 @@ imgWindow.onload = function(){
 	oriWidth = canvas.width;
 	oriHeight = canvas.height;
 	document.body.scrollTop = 0;
+	// 适配页面
 	panel.height = "100%";
+	document.body.width = "100%";
+	document.body.height = "100%";
 	clearFlag();
 	// 添加按键事件
 	if(!loadFlag){
@@ -143,6 +146,9 @@ imgWindow.onload = function(){
 					tipControl.innerHTML = "请选择第一个点";
 					tipControl.style.display = "block";				
 					flags.cutFlag = true;
+					panel.height = "100%";
+					document.body.width = "100%";
+					document.body.height = "100%";
 				}
 			})
 		});
