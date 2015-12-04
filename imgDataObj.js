@@ -94,8 +94,7 @@ ImgProcessor = {
 		}
 	},
 	oldEffect : function(ImgDataObj){
-		// 老照片效果
-		// this.checkNTrans(ImgDataObj, "array");				
+		// 老照片效果				
 		for(var i = 0; i < ImgDataObj.length; i ++){
 			var value = 0;		
 			value = 0.393 * ImgDataObj.rgba[0][i]
@@ -182,6 +181,22 @@ ImgProcessor = {
 		ImgDataObj.rgba[1] = ImgDataObj.rgba[0];
 		ImgDataObj.rgba[2] = ImgDataObj.rgba[0];
 		template = null;
+	},
+	avgFilterEffect : function(ImgDataObj, value){
+		// 均值滤波
+		function avg(){
+			// 求均值
+			var neb = arguments[0];
+			var res = 0;
+			var len = value * value;
+			for(var n = 0; n < len; n ++){
+				res += neb[n]; 
+			}				
+			return res / 9;
+		}
+		for(var k = 0; k < 3; k ++){
+			ImgDataObj.rgba[k] = templateCal(ImgDataObj.rgba[k], null, ImgDataObj.width, ImgDataObj.height, value, avg);
+		}
 	},	
 	medFilterEffect : function(ImgDataObj, value){
 		// 中值滤波			

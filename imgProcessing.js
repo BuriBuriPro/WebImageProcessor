@@ -1,8 +1,3 @@
-
-		// 
-		// 记得要做清除flag
-		// 
-
 // 获取标签
 var uploadImgBtn = getElem("uploadImgBtn"),
 	imgWindow = getElem("imgWindow"),
@@ -12,8 +7,8 @@ var uploadImgBtn = getElem("uploadImgBtn"),
 
 // 设置常用变量
 var context = canvas.getContext("2d"),
-	canvasWidth = 300,
-	canvasHeight = 300,
+	canvasWidth = 0,
+	canvasHeight = 0,
 	oriWidth = 0,
 	oriHeight = 0,
 	imgData = null,
@@ -69,6 +64,7 @@ var invertion = getElem("btnInvert"),
 	paintImg = getElem("btnPaint"),
 	savePoint = getElem("btnSave"),
 	cutImg = getElem("btnCut"),
+	avgImg = getElem("btnAVG"),
 	mask = getElem("mask");
 
 uploadImgBtn.addEventListener("change", function(){
@@ -142,12 +138,12 @@ imgWindow.onload = function(){
 				poss = [];
 				tipControl.innerHTML = "请选择第一个点";
 				tipControl.style.display = "block";				
-				cutFlag = true;
+				flags.cutFlag = true;
 			})
 		});
 		canvas.addEventListener("click", function(e){
 			// 截取图片点的记录
-			if(cutFlag){
+			if(flags.cutFlag){
 				if(!poss[0]){
 					poss[0] = getPos(canvas, e).x;
 					poss[1] = getPos(canvas, e).y;
@@ -173,6 +169,9 @@ imgWindow.onload = function(){
 							context.putImageData(cutImgData, 0, 0);
 							imgObj.saveImgData(context.getImageData(0, 0, canvas.width, canvas.height));
 							tipControl.style.display = "none";
+							if(window.confirm("是否要把预览区换成截图？")){
+								imgWindow.src = imgObj.trans2Img().src;
+							}
 						}
 					})	
 				}
@@ -252,7 +251,6 @@ imgWindow.onload = function(){
 				}			
 			});
 		});	
-
 		// 模板运算
 		reliefImg.addEventListener("click", function(){
 			// 浮雕效果
@@ -267,6 +265,21 @@ imgWindow.onload = function(){
 				}
 			});
 		});
+		avgImg.addEventListener("click", function(){
+			// 均值滤波
+			dealing(avgImg, function(){
+				clearFlag();
+				var value = window.prompt("请输入滤波程度, 范围在1-5");
+				if(value != null){
+					value = Math.min(parseInt(value) * 3 || 3, 15);
+					if(value % 2 == 0)
+						value ++;
+					log(value);
+					ImgProcessor.avgFilterEffect(imgObj, value);
+					updataCanvas();
+				}
+			})
+		})
 		medFilt.addEventListener("click", function(){
 			// 中值滤波效果
 			dealing(medFilt, function(){
@@ -274,6 +287,8 @@ imgWindow.onload = function(){
 				var value = window.prompt("请输入滤波程度，范围在1-5");
 				if(value != null){
 					value = Math.min(parseInt(value) * 3 || 3, 15);
+					if(value % 2 == 0)
+						value ++;
 					ImgProcessor.medFilterEffect(imgObj, value);
 					updataCanvas();			
 				}
