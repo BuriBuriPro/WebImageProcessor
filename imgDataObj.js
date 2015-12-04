@@ -52,83 +52,67 @@ ImgDataObj.prototype = {
 
 // 处理图像的工具对象
 ImgProcessor = {
+	mirrorEffect : function(can, cxt, imgData, imgObj, dir){
+		// 图片镜像
+		// 可选择水平镜像或垂直镜像
+			if(dir === "hor"){
+				cxt.scale(-1, 1);				
+				cxt.drawImage(can, -can.width, 0);
+				cxt.scale(-1, 1)
+			} else if(dir === "ver"){
+				cxt.scale(1, -1);
+				cxt.drawImage(can, 0, -can.height);
+				cxt.scale(1, -1);
+			}
+			imgData = context.getImageData(0, 0, can.width, can.height);
+			imgObj.saveImgData(imgData);
+	},
 	invertColor : function(ImgDataObj){
 		// 取反色
 		function invert(arr){
 		// 取反
-		var i = 0;
-		for(;i < arr.length; i ++){
-			arr[i] = 255 - arr[i];
-			}				
+			var i = 0;
+			for(;i < arr.length; i ++){
+				arr[i] = 255 - arr[i];
+				}				
 		}
 		for(var i = 0; i < 3; i ++){
 			invert(ImgDataObj.rgba[i]);
 		}
-	},	
-	medFilterEffect : function(ImgDataObj){
-		// 中值滤波			
-		function med(){
-			// 求中值
-			var neb = arguments[0];
-			neb.sort(function(a, b){
-				return a - b;
-			});	
-			var midNum = (neb.length + 1) / 2 - 1;
-			return neb[midNum];
-		}
-		for(var k = 0; k < 3; k ++){
-			ImgDataObj.rgba[k] = templateCal(ImgDataObj.rgba[k], null, ImgDataObj.width, ImgDataObj.height, 3, med);
-		}	
 	},
-	reliefEffect : function(ImgDataObj){
-		// 浮雕效果
-		template = [1, 0, 0, 0, -1, 0, 0, 0, 0];
-		// template = [-6, -3, 0, -3, -1, 3, 0, 3, 6];
-		function relief(){
-			var neb = arguments[0],
-				res = 0;
-			for(var n = 0; n < 9; n ++){
-				res += neb[n] * template[n];
-			}			
-			return res * 2 + 128;
+	greyEffect : function(ImgDataObj){
+		// 灰度化
+		// 加权平均法处理rgb
+		for(var i = 0; i < ImgDataObj.length; i ++){
+			var greyValue = 0;		
+			greyValue = 0.3 * ImgDataObj.rgba[0][i]
+					    + 0.59 * ImgDataObj.rgba[1][i]
+					    + 0.11 * ImgDataObj.rgba[2][i];
+			ImgDataObj.rgba[0][i] = greyValue;
+			ImgDataObj.rgba[1][i] = greyValue;
+			ImgDataObj.rgba[2][i] = greyValue;
 		}
-		ImgDataObj.rgba[0] = templateCal(ImgDataObj.rgba[0], template, ImgDataObj.width, ImgDataObj.height, 3, relief);
-		ImgDataObj.rgba[1] = ImgDataObj.rgba[0];
-		ImgDataObj.rgba[2] = ImgDataObj.rgba[0];
-		template = null;
 	},
-	blurEffect : function(ImgDataObj){
-		// 高斯模糊
-		template = [0.062467, 0.125, 0.062467, 0.125, 0.250131, 0.125, 0.062467, 0.125, 0.062467];		
-		function guass(){
-			var neb = arguments[0],
-				res = 0;
-			for(var n = 0; n < 9; n ++){
-				res += neb[n] * template[n]
-			}
-			return res;
+	oldEffect : function(ImgDataObj){
+		// 老照片效果
+		// this.checkNTrans(ImgDataObj, "array");				
+		for(var i = 0; i < ImgDataObj.length; i ++){
+			var value = 0;		
+			value = 0.393 * ImgDataObj.rgba[0][i]
+				    + 0.769 * ImgDataObj.rgba[1][i]
+				    + 0.189 * ImgDataObj.rgba[2][i];
+			ImgDataObj.rgba[0][i] = value;
+
+			value = 0.349 * ImgDataObj.rgba[0][i]
+					    + 0.686 * ImgDataObj.rgba[1][i]
+					    + 0.168 * ImgDataObj.rgba[2][i];
+			ImgDataObj.rgba[1][i] = value;
+
+			value = 0.272 * ImgDataObj.rgba[0][i]
+					    + 0.534 * ImgDataObj.rgba[1][i]
+					    + 0.131 * ImgDataObj.rgba[2][i];
+			ImgDataObj.rgba[2][i] = value;
 		}
-		for(var k = 0; k < 3; k ++){
-			ImgDataObj.rgba[k] = templateCal(ImgDataObj.rgba[k], template, ImgDataObj.width, ImgDataObj.height, 3, guass);
-		}
-		template = null;
-	},
-	laplaceEffect : function(ImgDataObj){
-		// 拉普拉斯锐化	
-		// template = [-1, -1, -1, -1, 9, -1, -1, -1, -1];
-		template = [0, -1, 0, -1, 5, -1, 0, -1, 0];
-		function laplace(){
-			var neb = arguments[0],
-				res = 0;
-			for(var n = 0; n < 9; n ++){
-				res += neb[n] * template[n]
-			}
-			return res;
-		}
-		for(var k = 0; k < 3; k ++){
-			ImgDataObj.rgba[k] = templateCal(ImgDataObj.rgba[k], template, ImgDataObj.width, ImgDataObj.height, 3, laplace);
-		}
-		template = null
 	},
 	fogEffect : function(ImgDataObj, range){
 		// 雾化效果	
@@ -151,38 +135,6 @@ ImgProcessor = {
 		ImgDataObj.rgba[0] = tempArr1;
 		ImgDataObj.rgba[1] = tempArr2;
 		ImgDataObj.rgba[2] = tempArr3;
-	},
-	greyEffect : function(ImgDataObj){
-		// 灰度化
-		// 加权平均法处理rgb
-		for(var i = 0; i < ImgDataObj.length; i ++){
-			var greyValue = 0;		
-			greyValue = 0.3 * ImgDataObj.rgba[0][i]
-					    + 0.59 * ImgDataObj.rgba[1][i]
-					    + 0.11 * ImgDataObj.rgba[2][i];
-			ImgDataObj.rgba[0][i] = greyValue;
-			ImgDataObj.rgba[1][i] = greyValue;
-			ImgDataObj.rgba[2][i] = greyValue;
-		}
-	},
-	MirrorImg : function(can, cxt, img, imgData, imgObj, dir){
-		// 图片镜像
-		// 可选择水平镜像或垂直镜像	
-		if(imgObj.mirrorFlag == false){
-			imgObj.mirrorFlag = true;
-			if(dir === "hor"){
-				cxt.scale(-1, 1);				
-				cxt.drawImage(can, -img.width, 0);
-				cxt.scale(-1, 1)
-			} else if(dir === "ver"){
-				cxt.scale(1, -1);
-				cxt.drawImage(can, 0, -img.height);
-				cxt.scale(1, -1);
-			}
-			imgData = context.getImageData(0, 0, can.width, can.height);
-			imgObj.saveImgData(imgData);
-			imgObj.mirrorFlag = false;
-		}
 	},
 	mosaicEffect : function(ImgDataObj, val){
 		// 马赛克效果
@@ -215,33 +167,81 @@ ImgProcessor = {
 		ImgDataObj.rgba[1] = resG;
 		ImgDataObj.rgba[2] = resB;
 	},
-	oldEffect : function(ImgDataObj){
-		// 老照片效果
-		// this.checkNTrans(ImgDataObj, "array");				
-		for(var i = 0; i < ImgDataObj.length; i ++){
-			var value = 0;		
-			value = 0.393 * ImgDataObj.rgba[0][i]
-				    + 0.769 * ImgDataObj.rgba[1][i]
-				    + 0.189 * ImgDataObj.rgba[2][i];
-			ImgDataObj.rgba[0][i] = value;
-
-			value = 0.349 * ImgDataObj.rgba[0][i]
-					    + 0.686 * ImgDataObj.rgba[1][i]
-					    + 0.168 * ImgDataObj.rgba[2][i];
-			ImgDataObj.rgba[1][i] = value;
-
-			value = 0.272 * ImgDataObj.rgba[0][i]
-					    + 0.534 * ImgDataObj.rgba[1][i]
-					    + 0.131 * ImgDataObj.rgba[2][i];
-			ImgDataObj.rgba[2][i] = value;
+	reliefEffect : function(ImgDataObj, value){
+		// 浮雕效果
+		template = [1, 0, 0, 0, -1, 0, 0, 0, 0];
+		function relief(){
+			var neb = arguments[0],
+				res = 0;
+			for(var n = 0; n < 9; n ++){
+				res += neb[n] * template[n];
+			}			
+			return res * value + 128;
 		}
+		ImgDataObj.rgba[0] = templateCal(ImgDataObj.rgba[0], template, ImgDataObj.width, ImgDataObj.height, 3, relief);
+		ImgDataObj.rgba[1] = ImgDataObj.rgba[0];
+		ImgDataObj.rgba[2] = ImgDataObj.rgba[0];
+		template = null;
+	},	
+	medFilterEffect : function(ImgDataObj, value){
+		// 中值滤波			
+		function med(){
+			// 求中值
+			var neb = arguments[0];
+			neb.sort(function(a, b){
+				return a - b;
+			});	
+			var midNum = (neb.length + 1) / 2 - 1;
+			return neb[midNum];
+		}
+		for(var k = 0; k < 3; k ++){
+			ImgDataObj.rgba[k] = templateCal(ImgDataObj.rgba[k], null, ImgDataObj.width, ImgDataObj.height, value, med);
+		}	
+	},
+	laplaceEffect : function(ImgDataObj){
+		// 拉普拉斯锐化	
+		template = [0, -1, 0, -1, 5, -1, 0, -1, 0];
+		function laplace(){
+			var neb = arguments[0],
+				res = 0;
+			for(var n = 0; n < 9; n ++){
+				res += neb[n] * template[n]
+			}
+			return res;
+		}
+		for(var k = 0; k < 3; k ++){
+			ImgDataObj.rgba[k] = templateCal(ImgDataObj.rgba[k], template, ImgDataObj.width, ImgDataObj.height, 3, laplace);
+		}
+		template = null
+	},
+	blurEffect : function(ImgDataObj){
+		// 高斯模糊
+		template = [0.062467, 0.125, 0.062467, 0.125, 0.250131, 0.125, 0.062467, 0.125, 0.062467];		
+		function guass(){
+			var neb = arguments[0],
+				res = 0;
+			for(var n = 0; n < 9; n ++){
+				res += neb[n] * template[n]
+			}
+			return res;
+		}
+		for(var k = 0; k < 3; k ++){
+			ImgDataObj.rgba[k] = templateCal(ImgDataObj.rgba[k], template, ImgDataObj.width, ImgDataObj.height, 3, guass);
+		}
+		template = null;
 	},
 	sketchEffect : function(ImgDataObj1, ImgDataObj2){		
 		for(var i = 0; i < 3; i ++){
 			ImgDataObj1.rgba[i] = colorOverlay(ImgDataObj1.rgba[i], ImgDataObj2.rgba[i], "doge");
 		}
 	},
+	turboEffect : function(ImgDataObj1, ImgDataObj2){
+		for(var i = 0; i < 3; i ++){
+			ImgDataObj1.rgba[i] = colorOverlay(ImgDataObj1.rgba[i], ImgDataObj2.rgba[i], "overlay");
+		}
+	},
 	lightEffect : function(ImgDataObj, pos, val){
+		// 添加光照
 		var width = ImgDataObj.width,
 			height = ImgDataObj.height;
 			rad = Math.min(pos.x, width - pos.x, pos.y, height - pos.y),
@@ -259,11 +259,6 @@ ImgProcessor = {
 					}
 				}
 			}
-		}
-	},
-	HDREffect : function(ImgDataObj1, ImgDataObj2){
-		for(var i = 0; i < 3; i ++){
-			ImgDataObj1.rgba[i] = colorOverlay(ImgDataObj1.rgba[i], ImgDataObj2.rgba[i], "overlay");
 		}
 	}
 }

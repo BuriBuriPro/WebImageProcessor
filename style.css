@@ -5,15 +5,16 @@ body, div, h2{
 html, body{
 	width: 100%;
 	height: 100%;
+	font-family: 微软雅黑;
 }
 #panel{
 	height: 100%;
 	width: 200px;
-	background-color: silver;
+	background-color: #CBCBCB;
 	float: left;	
 	overflow-y: scroll;
 	position: relative;
-	z-index: 8;
+	z-index: 8;	
 }
 #panel label{
 	margin-top: 10px;
@@ -34,7 +35,11 @@ html, body{
 	margin-top: 10px;
 	margin-left: 10px;
 	color: #000;
-	background-color: #fff;
+	background-color: #EEE;
+	border-radius: 5px;
+	border: none;
+	outline: none;
+	font-family: 微软雅黑;		
 }
 #screen{
 	margin-left: 210px;
