@@ -3,7 +3,8 @@ var uploadImgBtn = getElem("uploadImgBtn"),
 	imgWindow = getElem("imgWindow"),
 	canvas = getElem("canvas"),
 	coordinate = getElem("coordinate"),
-	panel = getElem("panel");
+	panel = getElem("panel"),
+	theScreen = getElem("screen");
 
 // 设置常用变量
 var context = canvas.getContext("2d"),
@@ -99,6 +100,8 @@ imgWindow.onload = function(){
 	panel.height = "100%";
 	document.body.width = "100%";
 	document.body.height = "100%";
+	theScreen.style.height = "100%";
+	theScreen.style.width = "100%";
 	clearFlag();
 	// 添加按键事件
 	if(!loadFlag){
@@ -146,9 +149,12 @@ imgWindow.onload = function(){
 					tipControl.innerHTML = "请选择第一个点";
 					tipControl.style.display = "block";				
 					flags.cutFlag = true;
+					// 适配页面
 					panel.height = "100%";
 					document.body.width = "100%";
 					document.body.height = "100%";
+					theScreen.style.height = "100%";
+					theScreen.style.width = "100%";
 				}
 			})
 		});
@@ -476,9 +482,6 @@ window.onscroll = function(){
 		scrollLeft = document.body.scrollLeft;	
 	panel.style.top = scrollTop + "px";
 	panel.style.left = scrollLeft + "px";
-	// 适配
-	document.body.width = "100%";
-	document.body.height = "100%";
 }
 
 // 便于获取标签
