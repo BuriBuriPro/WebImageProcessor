@@ -476,6 +476,9 @@ window.onscroll = function(){
 		scrollLeft = document.body.scrollLeft;	
 	panel.style.top = scrollTop + "px";
 	panel.style.left = scrollLeft + "px";
+	// 适配
+	document.body.width = "100%";
+	document.body.height = "100%";
 }
 
 // 便于获取标签
