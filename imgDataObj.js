@@ -122,7 +122,7 @@ ImgProcessor = {
 		for(var i = 0; i < ImgDataObj.length; i ++){
 			ran = Math.floor(range * Math.random()) * Math.floor(3 * Math.random() - 1);
 			if(i + ran >= 0 && i + ran < ImgDataObj.length){
-				tempArr1[i] = ImgDataObj.rgba[0][i + ran];
+				tempArr1[i] = ImgDataObj.rgba[0][i + ran];			
 				tempArr2[i] = ImgDataObj.rgba[1][i + ran];
 				tempArr3[i] = ImgDataObj.rgba[2][i + ran];
 			} else{

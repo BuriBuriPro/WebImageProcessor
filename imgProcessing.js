@@ -73,6 +73,7 @@ uploadImgBtn.addEventListener("change", function(){
 		imgWindow.src = reader.result;		
 		// 清空文件路径，实现重复选择图片
 		uploadImgBtn.value = "";
+		clearFlag();
 	}
 	// 判断确实选择图片才读取文件
 	if(this.value){
@@ -94,6 +95,8 @@ imgWindow.onload = function(){
 	oriWidth = canvas.width;
 	oriHeight = canvas.height;
 	document.body.scrollTop = 0;
+	panel.height = "100%";
+	clearFlag();
 	// 添加按键事件
 	if(!loadFlag){
 		// 判断是否已经读取过图片,避免重复绑定事件
@@ -123,7 +126,7 @@ imgWindow.onload = function(){
 			// 压缩图片
 			dealing(compress, function(){				
 				clearFlag();
-				var value = window.prompt("请输入想要压缩的程度，范围在0.0——1.0之间，默认为1.0");
+				var value = window.prompt("请输入想要压缩的程度，范围在0.0——1.0之间，默认为1.0。数值越小压缩程度越大。");
 				if(value != null){
 					value = Math.max(parseFloat(value) || 1.0, 0);
 					var comData = canvas.toDataURL("image/jpeg", value).replace("image/png", "image/octet-stream");		
@@ -134,11 +137,13 @@ imgWindow.onload = function(){
 		cutImg.addEventListener("click", function(){
 			// 截取图像的操作
 			dealing(cutImg, function(){
-				clearFlag();
-				poss = [];
-				tipControl.innerHTML = "请选择第一个点";
-				tipControl.style.display = "block";				
-				flags.cutFlag = true;
+				if(!flags.cutFlag){
+					clearFlag();
+					poss = [];
+					tipControl.innerHTML = "请选择第一个点";
+					tipControl.style.display = "block";				
+					flags.cutFlag = true;
+				}
 			})
 		});
 		canvas.addEventListener("click", function(e){
@@ -172,6 +177,7 @@ imgWindow.onload = function(){
 							if(window.confirm("是否要把预览区换成截图？")){
 								imgWindow.src = imgObj.trans2Img().src;
 							}
+							flags.cutFlag = false;
 						}
 					})	
 				}
@@ -462,7 +468,6 @@ imgWindow.onload = function(){
 window.onscroll = function(){
 	var scrollTop = document.body.scrollTop,
 		scrollLeft = document.body.scrollLeft;	
-
 	panel.style.top = scrollTop + "px";
 	panel.style.left = scrollLeft + "px";
 }
@@ -489,28 +494,28 @@ function getPos(can, e){
 }
 // 处理时弹出遮罩层和提示
 function dealing(btn, fun){
-		if(dealingFlag){
-			return;
-		}
-		dealingFlag = true;
-		tipCondition.style.display = "block";
-		mask.style.display = "block";
-		changeBtnStyle(btn, "add");
+	if(dealingFlag){
+		return;
+	}
+	dealingFlag = true;
+	tipCondition.style.display = "block";
+	mask.style.display = "block";
+	changeBtnStyle(btn, "add");
+	setTimeout(function(){
+		fun();				
+		tipCondition.style.display = "none";
+		mask.style.display = "none";			
 		setTimeout(function(){
-			fun();				
-			tipCondition.style.display = "none";
-			mask.style.display = "none";			
-			setTimeout(function(){
-				dealingFlag = false;
-			}, 100);
-			changeBtnStyle(btn, "remove");
-		}, 100)	
+			dealingFlag = false;
+		}, 100);
+		changeBtnStyle(btn, "remove");
+	}, 100)	
 }
 // 字符串10进制转16进制
 function deci2Hex(exp){
 	var temp = exp.split(" ", 3);
 	for(var i = 0; i < 3; i ++){
-	temp[i] =  Math.min((parseInt(temp[i]) || 000), 255).toString(16);
+		temp[i] =  Math.min((parseInt(temp[i]) || 000), 255).toString(16);
 	}
 	return temp.join("");
 }
