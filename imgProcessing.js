@@ -476,64 +476,7 @@ imgWindow.onload = function(){
 					}				
 				});		
 			}	
-		});		
-		//改进插入图片			
-		/*
-		cutImg.addEventListener("click", function(){
-			// 截取图像的操作
-			dealing(cutImg, function(){
-				if(!flags.cutFlag){
-					clearFlag();
-					poss = [];
-					tipControl.innerHTML = "请选择第一个点";
-					tipControl.style.display = "block";				
-					flags.cutFlag = true;
-					// 适配页面
-					panel.height = "100%";
-					document.body.width = "100%";
-					document.body.height = "100%";
-					theScreen.style.height = "100%";
-					theScreen.style.width = "100%";
-				}
-			})
 		});
-		canvas.addEventListener("click", function(e){
-			// 截取图片点的记录
-			if(flags.cutFlag){
-				if(!poss[0]){
-					poss[0] = getPos(canvas, e).x;
-					poss[1] = getPos(canvas, e).y;
-					tipControl.innerHTML = "请选择第二个点";
-				} else{
-					// 还要判断第一个点和第二个点哪个大					
-					poss[2] = getPos(canvas, e).x - poss[0];
-					poss[3]	= getPos(canvas, e).y - poss[1];	
-					if(poss[2] < 0){						
-						poss[2] = Math.abs(poss[2]);
-						poss[0] = Math.max(poss[0] - poss[2], 0);
-					}
-					if(poss[3] < 0){						
-						poss[3] = Math.abs(poss[3]);
-						poss[1] = Math.max(poss[1] - poss[3], 0);
-					}
-					dealing(cutImg, function(){
-						if(window.confirm("确定截图的位置了吗？")){
-							var cutImgData = context.getImageData(poss[0], poss[1], poss[2], poss[3]);
-							context.clearRect(0, 0, canvas.width, canvas.height);
-							canvas.width = poss[2];
-							canvas.height = poss[3];
-							context.putImageData(cutImgData, 0, 0);
-							imgObj.saveImgData(context.getImageData(0, 0, canvas.width, canvas.height));
-							tipControl.style.display = "none";
-							if(window.confirm("是否要把预览区换成截图？")){
-								imgWindow.src = imgObj.trans2Img().src;
-							}
-							flags.cutFlag = false;
-						}
-					})	
-				}
-			}
-		});*/
 	}
 }
 
