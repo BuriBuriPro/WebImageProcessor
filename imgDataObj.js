@@ -10,7 +10,6 @@ function ImgDataObj(){
 	this.length = 0;
 	this.width = 0;
 	this.height = 0;
-	this.mirrorFlag = false;	
 }
 
 // 存储canvas中图像数据的对象的一些公有方法
